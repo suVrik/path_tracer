@@ -1,6 +1,10 @@
-#include "geometry.h"
-#include "integrator.h"
-#include "material.h"
+#include "geometry/box_geometry.h"
+#include "geometry/sphere_geometry.h"
+#include "integrator/bidirectional_path_tracer_integrator.h"
+#include "material/diffuse_material.h"
+#include "material/emissive_material.h"
+#include "material/specular_reflective_material.h"
+#include "material/specular_transmissive_material.h"
 #include "primitive.h"
 
 #include <cassert>
@@ -64,26 +68,26 @@ static std::vector<Primitive> build_scene() {
     float4x4 right_box_transform = float4x4::rotation(float3(0.f, 1.f, 0.f), radians(20.f)) * float4x4::translation(float3(0.175f, -0.35f, 2.3f));
 
     return std::vector<Primitive> {
-        { long_wall_geometry,  red_material,      float4x4::translation(float3(-1.f, 0.f, 1.4f))  }, // left wall
-        { long_wall_geometry,  green_material,    float4x4::translation(float3(1.f, 0.f, 1.4f))   }, // right wall
-        { long_wall_geometry,  white_material,    float4x4::translation(float3(0.f, -1.f, 1.4f))  }, // bottom wall
-        { short_wall_geometry, white_material,    float4x4::translation(float3(0.f, 0.f, 3.4f))   }, // front wall
-        { short_wall_geometry, white_material,    float4x4::translation(float3(0.f, 0.f, -0.6f))  }, // back wall
-        { top_side_geometry,   white_material,    float4x4::translation(float3(-0.3f, 1.f, 1.4f)) }, // top left wall
-        { top_side_geometry,   white_material,    float4x4::translation(float3(0.3f, 1.f, 1.4f))  }, // top right wall
-        { top_front_geometry,  white_material,    float4x4::translation(float3(0.f, 1.f, 2.7f))   }, // top front wall
-        { top_back_geometry,   white_material,    float4x4::translation(float3(0.f, 1.f, 1.1f))   }, // top back wall
+        { long_wall_geometry,  red_material,   float4x4::translation(float3(-1.f, 0.f, 1.4f))  }, // left wall
+        { long_wall_geometry,  green_material, float4x4::translation(float3(1.f, 0.f, 1.4f))   }, // right wall
+        { long_wall_geometry,  white_material, float4x4::translation(float3(0.f, -1.f, 1.4f))  }, // bottom wall
+        { short_wall_geometry, white_material, float4x4::translation(float3(0.f, 0.f, 3.4f))   }, // front wall
+        { short_wall_geometry, white_material, float4x4::translation(float3(0.f, 0.f, -0.6f))  }, // back wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(-0.3f, 1.f, 1.4f)) }, // top left wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(0.3f, 1.f, 1.4f))  }, // top right wall
+        { top_front_geometry,  white_material, float4x4::translation(float3(0.f, 1.f, 2.7f))   }, // top front wall
+        { top_back_geometry,   white_material, float4x4::translation(float3(0.f, 1.f, 1.1f))   }, // top back wall
 
-        //{ left_box_geometry,  white_material, left_box_transform  }, // left box
-        //{ right_box_geometry, white_material, right_box_transform }, // right box
+        { left_box_geometry,  white_material, left_box_transform  }, // left box
+        { right_box_geometry, white_material, right_box_transform }, // right box
 
         //{ sphere_geometry, reflective_material, float4x4::translation(float3(-0.175f, -0.35f, 2.5f)) }, // left sphere
         //{ sphere_geometry, reflective_material, float4x4::translation(float3(0.175f, -0.35f, 2.3f)) }, // right sphere
 
-        { sphere_geometry, transmissive_material, float4x4::translation(float3(-0.175f, -0.35f, 2.5f)) }, // left sphere
-        { sphere_geometry, transmissive_material, float4x4::translation(float3(0.175f, -0.35f, 2.3f)) }, // right sphere
+        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(-0.175f, -0.35f, 2.5f)) }, // left sphere
+        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(0.175f, -0.35f, 2.3f)) }, // right sphere
 
-        { lamp_geometry,       emissive_material, float4x4::translation(float3(0.f, 0.61f, 2.4f)) }, // lamp
+        { lamp_geometry, emissive_material, float4x4::translation(float3(0.f, 0.61f, 2.4f)) }, // lamp
     };
 }
 
@@ -97,7 +101,7 @@ static bool poll_events() {
     return true;
 }
 
-static void blit(std::unique_ptr<Integrator>& integrator, SDL_Texture* texture) {
+static void blit(Integrator* integrator, SDL_Texture* texture) {
     void* data;
     int pitch;
 
@@ -129,11 +133,11 @@ int main(int arc, char* argv[]) {
     SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     assert(texture != nullptr);
 
-    auto integrator = std::make_unique<Integrator>(TEXTURE_WIDTH, TEXTURE_HEIGHT, SAMPLES_PER_PIXEL, DIFFUSE_BOUNCES_MAX, SPECULAR_BOUNCES_MAX, build_scene());
+    auto integrator = std::make_unique<BidirectionalPathTracerIntegrator>(TEXTURE_WIDTH, TEXTURE_HEIGHT, SAMPLES_PER_PIXEL, DIFFUSE_BOUNCES_MAX, SPECULAR_BOUNCES_MAX, build_scene());
     assert(integrator != nullptr);
 
     while (poll_events()) {
-        blit(integrator, texture);
+        blit(integrator.get(), texture);
         present(renderer, texture);
     }
 
