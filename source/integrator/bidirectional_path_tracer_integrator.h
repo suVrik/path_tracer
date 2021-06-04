@@ -1,5 +1,6 @@
 #pragma once
 
+#include "integrator/integrator.h"
 #include "film.h"
 #include "primitive.h"
 
@@ -7,12 +8,12 @@
 #include <thread>
 #include <vector>
 
-class Integrator {
+class BidirectionalPathTracerIntegrator : public Integrator {
 public:
-    Integrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives);
-    ~Integrator();
+    BidirectionalPathTracerIntegrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives);
+    ~BidirectionalPathTracerIntegrator() override;
 
-    void blit(void* rgba, int pitch);
+    void blit(void* rgba, int pitch) override;
 
 private:
     void integrate(int thread_index);

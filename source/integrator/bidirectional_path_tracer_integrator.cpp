@@ -1,4 +1,4 @@
-#include "integrator.h"
+#include "integrator/bidirectional_path_tracer_integrator.h"
 #include "random.h"
 
 #include <algorithm>
@@ -13,7 +13,7 @@ struct Bounce {
     float3 beta;
 };
 
-Integrator::Integrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives)
+BidirectionalPathTracerIntegrator::BidirectionalPathTracerIntegrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives)
     : m_film(width, height)
     , m_samples_per_pixel(samples_per_pixel)
     , m_max_diffuse_bounces(max_diffuse_bounces)
@@ -34,11 +34,11 @@ Integrator::Integrator(int width, int height, int samples_per_pixel, int max_dif
 
     m_threads.reserve(m_thread_count);
     for (int i = 0; i < m_thread_count; i++) {
-        m_threads.push_back(std::thread(&Integrator::integrate, this, i));
+        m_threads.push_back(std::thread(&BidirectionalPathTracerIntegrator::integrate, this, i));
     }
 }
 
-Integrator::~Integrator() {
+BidirectionalPathTracerIntegrator::~BidirectionalPathTracerIntegrator() {
     m_is_running = false;
 
     for (std::thread& thread : m_threads) {
@@ -46,11 +46,11 @@ Integrator::~Integrator() {
     }
 }
 
-void Integrator::blit(void* rgba, int pitch) {
+void BidirectionalPathTracerIntegrator::blit(void* rgba, int pitch) {
     m_film.blit(rgba, pitch);
 }
 
-void Integrator::integrate(int thread_index) {
+void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
     assert(thread_index >= 0 && thread_index < m_thread_count);
 
     Random random(thread_index);
@@ -64,7 +64,7 @@ void Integrator::integrate(int thread_index) {
 
     int tiles_count = end_tile_index - begin_tile_index;
 
-    float4x4 projection = float4x4::perspective_lh(radians(30.f), static_cast<float>(m_film.width) / m_film.height, 1.f, 10.f);
+    float4x4 projection = float4x4::perspective(radians(30.f), static_cast<float>(m_film.width) / m_film.height, 1.f, 10.f);
     float4x4 inv_projection = inverse(projection);
 
     std::vector<Bounce> camera_bounces;
@@ -241,7 +241,7 @@ void Integrator::integrate(int thread_index) {
     }
 }
 
-std::optional<Integrator::PrimitiveHit> Integrator::raycast(const float3& origin, const float3& direction) const {
+std::optional<BidirectionalPathTracerIntegrator::PrimitiveHit> BidirectionalPathTracerIntegrator::raycast(const float3& origin, const float3& direction) const {
     std::optional<PrimitiveHit> result;
     float length = std::numeric_limits<float>::infinity();
 
