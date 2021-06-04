@@ -125,7 +125,7 @@ int main(int arc, char* argv[]) {
     int init = SDL_Init(SDL_INIT_VIDEO);
     assert(init == 0);
 
-    SDL_Window* window = SDL_CreateWindow("softPATH", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+    SDL_Window* window = SDL_CreateWindow("Path Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     assert(window != nullptr);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);

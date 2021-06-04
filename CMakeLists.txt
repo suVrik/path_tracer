@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-project(softPATH)
+project(path_tracer)
 
 find_package(SDL2 CONFIG REQUIRED)
 
@@ -9,10 +9,10 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB_RECURSE HEADERS "source/*.h")
 file(GLOB_RECURSE SOURCES "source/*.cpp")
-add_executable(softPATH ${SOURCES} ${HEADERS})
+add_executable(path_tracer ${SOURCES} ${HEADERS})
 
-target_link_libraries(softPATH PRIVATE SDL2::SDL2 SDL2::SDL2main)
-target_include_directories(softPATH PRIVATE "source")
+target_link_libraries(path_tracer PRIVATE SDL2::SDL2 SDL2::SDL2main)
+target_include_directories(path_tracer PRIVATE "source")
 
 source_group(
     TREE "${CMAKE_CURRENT_SOURCE_DIR}/source"
