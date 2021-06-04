@@ -4,7 +4,6 @@
 
 constexpr float PI      = 3.14159265359f;
 constexpr float EPSILON = 1e-6f;
-constexpr float SQRT_2  = 1.41421356237f;
 
 constexpr float sqr(float value) {
     return value * value;
@@ -33,11 +32,13 @@ constexpr float radians(float degrees) {
 class float2 {
 public:
     explicit constexpr float2(float all = 0.f)
-        : x(all), y(all) {
+        : x(all), y(all)
+    {
     }
     
     explicit constexpr float2(float x, float y) 
-        : x(x), y(y) {
+        : x(x), y(y)
+    {
     }
 
     constexpr float* begin() {
@@ -223,16 +224,19 @@ inline bool isfinite(const float2& value) {
 class float3 {
 public:
     explicit constexpr float3(float all = 0.f)
-        : x(all), y(all), z(all) {
+        : x(all), y(all), z(all)
+    {
     }
 
 
     explicit constexpr float3(float x, float y, float z)
-        : x(x), y(y), z(z) {
+        : x(x), y(y), z(z)
+    {
     }
 
     explicit constexpr float3(const float2& value, float z)
-        : x(value.x), y(value.y), z(z) {
+        : x(value.x), y(value.y), z(z)
+    {
     }
 
     constexpr float* begin() {
@@ -431,272 +435,24 @@ inline bool isfinite(const float3& value) {
     return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z);
 }
 
-class float4 {
-public:
-    explicit constexpr float4(float all = 0.f)
-        : x(all), y(all), z(all), w(all) {
-    }
-    
-    explicit constexpr float4(float x, float y, float z, float w)
-        : x(x), y(y), z(z), w(w) {
-    }
-
-    explicit constexpr float4(const float2& value, float z, float w)
-        : x(value.x), y(value.y), z(z), w(w) {
-    }
-
-    explicit constexpr float4(const float3& value, float w)
-        : x(value.x), y(value.y), z(value.z), w(w) {
-    }
-
-    constexpr float* begin() {
-        return data;
-    }
-
-    constexpr const float* begin() const {
-        return data;
-    }
-
-    constexpr float* end() {
-        return data + 4;
-    }
-
-    constexpr const float* end() const {
-        return data + 4;
-    }
-
-    constexpr float4 operator+(const float4& rhs) const {
-        return float4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
-    }
-
-    constexpr float4 operator-(const float4& rhs) const {
-        return float4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
-    }
-
-    constexpr float4 operator*(const float4& rhs) const {
-        return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
-    }
-
-    constexpr float4 operator/(const float4& rhs) const {
-        return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
-    }
-
-    constexpr float4& operator+=(const float4& value) {
-        x += value.x;
-        y += value.y;
-        z += value.z;
-        w += value.w;
-
-        return *this;
-    }
-
-    constexpr float4& operator-=(const float4& value) {
-        x -= value.x;
-        y -= value.y;
-        z -= value.z;
-        w -= value.w;
-
-        return *this;
-    }
-
-    constexpr float4& operator*=(const float4& value) {
-        x *= value.x;
-        y *= value.y;
-        z *= value.z;
-        w *= value.w;
-
-        return *this;
-    }
-
-    constexpr float4& operator/=(const float4& value) {
-        x /= value.x;
-        y /= value.y;
-        z /= value.z;
-        w /= value.w;
-
-        return *this;
-    }
-
-    constexpr float4& operator*=(float value) {
-        x *= value;
-        y *= value;
-        z *= value;
-        w *= value;
-
-        return *this;
-    }
-
-    constexpr float4& operator/=(float value) {
-        x /= value;
-        y /= value;
-        z /= value;
-        w /= value;
-
-        return *this;
-    }
-
-    constexpr float& operator[](size_t index) {
-        return data[index];
-    }
-
-    constexpr const float& operator[](size_t index) const {
-        return data[index];
-    }
-
-    constexpr float4 operator-() const {
-        return float4(-x, -y, -z, -w);
-    }
-
-    constexpr float4 operator*(float rhs) const {
-        return float4(x * rhs, y * rhs, z * rhs, w * rhs);
-    }
-
-    constexpr float4 operator/(float rhs) const {
-        return float4(x / rhs, y / rhs, z / rhs, w / rhs);
-    }
-
-    constexpr bool operator==(const float4& value) const {
-        return x == value.x && y == value.y && z == value.z && w == value.w;
-    }
-
-    constexpr bool operator!=(const float4& value) const {
-        return x != value.x || y != value.y || z != value.z || w != value.w;
-    }
-
-    constexpr float* operator&() {
-        return data;
-    }
-
-    constexpr const float* operator&() const {
-        return data;
-    }
-
-    explicit constexpr operator float2() const {
-        return float2(x, y);
-    }
-
-    explicit constexpr operator float3() const {
-        return float3(x, y, z);
-    }
-
-    friend constexpr float4 operator*(float lhs, const float4& rhs) {
-        return rhs * lhs;
-    }
-
-    union {
-        struct {
-            float x, y, z, w;
-        };
-
-        struct {
-            float r, g, b, a;
-        };
-
-        float data[4];
-    };
-};
-
-constexpr float dot(const float4& lhs, const float4& rhs) {
-    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z + lhs.w * rhs.w;
-}
-
-constexpr float4 cross(const float4& lhs, const float4& rhs) {
-    return float4(lhs.y * rhs.z - rhs.y * lhs.z,
-                  lhs.z * rhs.x - lhs.x * rhs.z, 
-                  lhs.x * rhs.y - lhs.y * rhs.x, 
-                  1.f);
-}
-
-constexpr float4 cross(const float4& lhs, const float3& rhs) {
-    return float4(lhs.y * rhs.z - rhs.y * lhs.z,
-                  lhs.z * rhs.x - lhs.x * rhs.z, 
-                  lhs.x * rhs.y - lhs.y * rhs.x, 
-                  1.f);
-}
-
-constexpr float4 cross(const float3& lhs, const float4& rhs) {
-    return float4(lhs.y * rhs.z - rhs.y * lhs.z,
-                  lhs.z * rhs.x - lhs.x * rhs.z, 
-                  lhs.x * rhs.y - lhs.y * rhs.x, 
-                  1.f);
-}
-
-constexpr float square_length(const float4& value) {
-    return sqr(value.x) + sqr(value.y) + sqr(value.z) + sqr(value.w);
-}
-
-inline float length(const float4& value) {
-    return std::sqrt(square_length(value));
-}
-
-constexpr float square_distance(const float4& lhs, const float4& rhs) {
-    return sqr(lhs.x - rhs.x) + sqr(lhs.y - rhs.y) + sqr(lhs.z - rhs.z) + sqr(lhs.w - rhs.w);
-}
-
-inline float distance(const float4& lhs, const float4& rhs) {
-    return std::sqrt(square_distance(lhs, rhs));
-}
-
-inline float4 normalize(const float4& value) {
-    float multiplier = 1.f / length(value);
-    return float4(value.x * multiplier, value.y * multiplier, value.z * multiplier, value.w * multiplier);
-}
-
-constexpr float4 lerp(const float4& from, const float4& to, float factor) {
-    return from + (to - from) * factor;
-}
-
-constexpr float4 clamp(const float4& value, float min, float max) {
-    return float4(clamp(value.x, min, max),
-                  clamp(value.y, min, max),
-                  clamp(value.z, min, max),
-                  clamp(value.w, min, max));
-}
-
-constexpr float4 clamp(const float4& value, const float4& min, const float4& max) {
-    return float4(clamp(value.x, min.x, max.x), 
-                  clamp(value.y, min.y, max.y), 
-                  clamp(value.z, min.z, max.z), 
-                  clamp(value.w, min.w, max.w));
-}
-
-inline float4 reflect(const float4& vector, const float4& normal) {
-    return vector - 2.f * dot(vector, normal) * normal;
-}
-
-constexpr bool equal(const float4& lhs, const float4& rhs, float epsilon = EPSILON) {
-    return equal(lhs.x, rhs.x, epsilon) &&
-           equal(lhs.y, rhs.y, epsilon) &&
-           equal(lhs.z, rhs.z, epsilon) &&
-           equal(lhs.w, rhs.w, epsilon);
-}
-
-constexpr bool equal(const float4& lhs, float rhs, float epsilon = EPSILON) {
-    return equal(lhs.x, rhs, epsilon) &&
-           equal(lhs.y, rhs, epsilon) &&
-           equal(lhs.z, rhs, epsilon) &&
-           equal(lhs.w, rhs, epsilon);
-}
-
-inline bool isfinite(const float4& value) {
-    return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z) && std::isfinite(value.w);
-}
-
 class float2x2 {
 public:
     explicit constexpr float2x2()
         : _11(1.f), _12(0.f)
-        , _21(0.f), _22(1.f) {
+        , _21(0.f), _22(1.f)
+    {
     }
 
     explicit constexpr float2x2(float _11, float _12,
                                 float _21, float _22)
         : _11(_11), _12(_12)
-        , _21(_21), _22(_22) {
+        , _21(_21), _22(_22)
+    {
     }
 
     constexpr float2x2(const float2& _r0, const float2& _r1) 
-        : _r0(_r0), _r1(_r1) {
+        : _r0(_r0), _r1(_r1)
+    {
     }
 
     constexpr float* begin() {
@@ -885,7 +641,8 @@ public:
     explicit constexpr float3x3()
         : _11(1.f), _12(0.f), _13(0.f)
         , _21(0.f), _22(1.f), _23(0.f)
-        , _31(0.f), _32(0.f), _33(1.f) {
+        , _31(0.f), _32(0.f), _33(1.f)
+    {
     }
 
     explicit constexpr float3x3(float _11, float _12, float _13,
@@ -893,17 +650,20 @@ public:
                                 float _31, float _32, float _33)
         : _11(_11), _12(_12), _13(_13)
         , _21(_21), _22(_22), _23(_23)
-        , _31(_31), _32(_32), _33(_33) {
+        , _31(_31), _32(_32), _33(_33)
+    {
     }
 
     explicit constexpr float3x3(const float2x2& value)
         : _11(value._11), _12(value._12), _13(0.f)
         , _21(value._21), _22(value._22), _23(0.f)
-        , _31(0.f),       _32(0.f),       _33(1.f) {
+        , _31(0.f),       _32(0.f),       _33(1.f)
+    {
     }
 
     constexpr float3x3(const float3& _r0, const float3& _r1, const float3& _r2)
-        : _r0(_r0), _r1(_r1), _r2(_r2) {
+        : _r0(_r0), _r1(_r1), _r2(_r2)
+    {
     }
 
     constexpr float* begin() {
@@ -1164,20 +924,14 @@ public:
     static float4x4 scale(const float3& scale);
     static float4x4 translation(const float3& translation);
 
-    static float4x4 perspective_lh(float fov_y, float aspect, float z_near, float z_far);
-    static float4x4 perspective_rh(float fov_y, float aspect, float z_near, float z_far);
-
-    static float4x4 orthographic_lh(float left, float right, float bottom, float top, float z_near, float z_far);
-    static float4x4 orthographic_rh(float left, float right, float bottom, float top, float z_near, float z_far);
-
-    static float4x4 look_at_lh(const float3& source, const float3& target, const float3& up);
-    static float4x4 look_at_rh(const float3& source, const float3& target, const float3& up);
+    static float4x4 perspective(float fov_y, float aspect, float z_near, float z_far);
 
     explicit constexpr float4x4()
         : _11(1.f), _12(0.f), _13(0.f), _14(0.f)
         , _21(0.f), _22(1.f), _23(0.f), _24(0.f)
         , _31(0.f), _32(0.f), _33(1.f), _34(0.f)
-        , _41(0.f), _42(0.f), _43(0.f), _44(1.f) {
+        , _41(0.f), _42(0.f), _43(0.f), _44(1.f)
+    {
     }
 
     explicit constexpr float4x4(float _11, float _12, float _13, float _14,
@@ -1187,25 +941,24 @@ public:
         : _11(_11), _12(_12), _13(_13), _14(_14)
         , _21(_21), _22(_22), _23(_23), _24(_24)
         , _31(_31), _32(_32), _33(_33), _34(_34)
-        , _41(_41), _42(_42), _43(_43), _44(_44) {
+        , _41(_41), _42(_42), _43(_43), _44(_44)
+    {
     }
 
     explicit constexpr float4x4(const float2x2& value)
         : _11(value._11), _12(value._12), _13(0.f), _14(0.f)
         , _21(value._21), _22(value._22), _23(0.f), _24(0.f)
         , _31(0.f),       _32(0.f),       _33(1.f), _34(0.f)
-        , _41(0.f),       _42(0.f),       _43(0.f), _44(1.f) {
+        , _41(0.f),       _42(0.f),       _43(0.f), _44(1.f)
+    {
     }
 
     explicit constexpr float4x4(const float3x3& value)
         : _11(value._11), _12(value._12), _13(value._13), _14(0.f)
         , _21(value._21), _22(value._22), _23(value._23), _24(0.f)
         , _31(value._31), _32(value._32), _33(value._33), _34(0.f)
-        , _41(0.f),       _42(0.f),       _43(0.f),       _44(1.f) {
-    }
-
-    constexpr float4x4(const float4& _r0, const float4& _r1, const float4& _r2, const float4& _r3)
-        : _r0(_r0), _r1(_r1), _r2(_r2), _r3(_r3) {
+        , _41(0.f),       _42(0.f),       _43(0.f),       _44(1.f)
+    {
     }
 
     constexpr float* begin() {
@@ -1364,14 +1117,6 @@ public:
         return *this;
     }
 
-    constexpr float4& operator[](size_t index) {
-        return rows[index];
-    }
-
-    constexpr const float4& operator[](size_t index) const {
-        return rows[index];
-    }
-
     constexpr float4x4 operator-() const {
         return float4x4(-_11, -_12, -_13, -_14,
                         -_21, -_22, -_23, -_24,
@@ -1384,13 +1129,6 @@ public:
                         _21 * rhs, _22 * rhs, _23 * rhs, _24 * rhs,
                         _31 * rhs, _32 * rhs, _33 * rhs, _34 * rhs,
                         _41 * rhs, _42 * rhs, _43 * rhs, _44 * rhs);
-    }
-
-    constexpr float4 operator*(const float4& rhs) const {
-        return float4(_11 * rhs.x + _12 * rhs.y + _13 * rhs.z + _14 * rhs.w,
-                      _21 * rhs.x + _22 * rhs.y + _23 * rhs.z + _24 * rhs.w,
-                      _31 * rhs.x + _32 * rhs.y + _33 * rhs.z + _34 * rhs.w,
-                      _41 * rhs.x + _42 * rhs.y + _43 * rhs.z + _44 * rhs.w);
     }
 
     constexpr float3 operator*(const float3& rhs)  const{
@@ -1425,13 +1163,6 @@ public:
         return rhs * lhs;
     }
 
-    friend constexpr float4 operator*(const float4& lhs, const float4x4& rhs) {
-        return float4(lhs.x * rhs._11 + lhs.y * rhs._21 + lhs.z * rhs._31 + lhs.w * rhs._41,
-                      lhs.x * rhs._12 + lhs.y * rhs._22 + lhs.z * rhs._32 + lhs.w * rhs._42,
-                      lhs.x * rhs._13 + lhs.y * rhs._23 + lhs.z * rhs._33 + lhs.w * rhs._43,
-                      lhs.x * rhs._14 + lhs.y * rhs._24 + lhs.z * rhs._34 + lhs.w * rhs._44);
-    }
-
     friend constexpr float3 operator*(const float3& lhs, const float4x4& rhs) {
         return float3(lhs.x * rhs._11 + lhs.y * rhs._21 + lhs.z * rhs._31,
                       lhs.x * rhs._12 + lhs.y * rhs._22 + lhs.z * rhs._32,
@@ -1453,14 +1184,6 @@ public:
             float _41, _42, _43, _44;
         };
 
-        struct {
-            float4 _r0;
-            float4 _r1;
-            float4 _r2;
-            float4 _r3;
-        };
-
-        float4 rows[4];
         float cells[16];
     };
 };
@@ -1589,187 +1312,6 @@ inline bool isfinite(const float4x4& value) {
            std::isfinite(value._21) && std::isfinite(value._22) && std::isfinite(value._23) && std::isfinite(value._24) && 
            std::isfinite(value._31) && std::isfinite(value._32) && std::isfinite(value._33) && std::isfinite(value._34) && 
            std::isfinite(value._41) && std::isfinite(value._42) && std::isfinite(value._43) && std::isfinite(value._44);
-}
-
-class quaternion {
-public:
-    static quaternion rotation(const float3& axis, float angle);
-    static quaternion shortest_arc(const float3& from, const float3& to, const float3& spin_axis);
-    static quaternion from_matrix(const float3x3& matrix);
-    static quaternion from_matrix(const float4x4& matrix);
-    static float4x4 to_matrix(const quaternion& quaternion);
-
-    constexpr quaternion() 
-        : x(0.f), y(0.f), z(0.f), w(1.f) {
-    }
-
-    constexpr quaternion(float x, float y, float z, float w)
-        : x(x), y(y), z(z), w(w) {
-    }
-
-    constexpr quaternion(const float3& value, float w)
-        : x(value.x), y(value.y), z(value.z), w(w) {
-    }
-
-    explicit constexpr quaternion(const float4& value)
-        : x(value.x), y(value.y), z(value.z), w(value.w) {
-    }
-
-    constexpr float* begin() {
-        return data;
-    }
-
-    constexpr const float* begin() const {
-        return data;
-    }
-
-    constexpr float* end() {
-        return data + 4;
-    }
-
-    constexpr const float* end() const {
-        return data + 4;
-    }
-
-    constexpr quaternion operator*(const quaternion& rhs) const {
-        float a = (w + x) * (rhs.w + rhs.x);
-        float b = (z - y) * (rhs.y - rhs.z);
-        float c = (x - w) * (rhs.y + rhs.z);
-        float d = (y + z) * (rhs.x - rhs.w);
-        float e = (x + z) * (rhs.x + rhs.y);
-        float f = (x - z) * (rhs.x - rhs.y);
-        float g = (w + y) * (rhs.w - rhs.z);
-        float h = (w - y) * (rhs.w + rhs.z);
-
-        return quaternion( b + (-e - f + g + h) * 0.5f,
-                           a - ( e + f + g + h) * 0.5f,
-                          -c + ( e - f + g - h) * 0.5f,
-                          -d + ( e - f - g + h) * 0.5f);
-    }
-
-    constexpr quaternion& operator*=(const quaternion& value) {
-        float a = (w + x) * (value.w + value.x);
-        float b = (z - y) * (value.y - value.z);
-        float c = (x - w) * (value.y + value.z);
-        float d = (y + z) * (value.x - value.w);
-        float e = (x + z) * (value.x + value.y);
-        float f = (x - z) * (value.x - value.y);
-        float g = (w + y) * (value.w - value.z);
-        float h = (w - y) * (value.w + value.z);
-
-        x =  b + (-e - f + g + h) * 0.5f;
-        y =  a - ( e + f + g + h) * 0.5f;
-        z = -c + ( e - f + g - h) * 0.5f;
-        w = -d + ( e - f - g + h) * 0.5f;
-
-        return *this;
-    }
-
-    constexpr quaternion operator-() const {
-        return quaternion(-x, -y, -z, -w);
-    }
-
-    constexpr float& operator[](size_t index) {
-        return data[index];
-    }
-
-    constexpr const float& operator[](size_t index) const {
-        return data[index];
-    }
-
-    constexpr bool operator==(const quaternion& value) const {
-        return x == value.x && y == value.y && z == value.z && w == value.w;
-    }
-
-    constexpr bool operator!=(const quaternion& value) const {
-        return x != value.x || y != value.y || z != value.z || w != value.w;
-    }
-
-    constexpr float* operator&() {
-        return data;
-    }
-
-    constexpr const float* operator&() const {
-        return data;
-    }
-
-    friend constexpr float3 operator*(const float3& lhs, const quaternion& rhs) {
-        float3 a(rhs.x, rhs.y, rhs.z);
-        float3 b(cross(a, lhs));
-        float3 c(cross(a, b));
-        return lhs + ((b * rhs.w) + c) * 2.f;
-    }
-
-    friend constexpr float4 operator*(const float4& lhs, const quaternion& rhs) {
-        return float4(float3(lhs.x, lhs.y, lhs.z) * rhs, 0.f);
-    }
-
-    union {
-        struct {
-            float x, y, z, w;
-        };
-
-        float data[4];
-    };
-};
-
-constexpr float square_length(const quaternion& value) {
-    return sqr(value.x) + sqr(value.y) + sqr(value.z) + sqr(value.w);
-}
-
-inline float length(const quaternion& value) {
-    return std::sqrt(square_length(value));
-}
-
-inline quaternion normalize(const quaternion& value) {
-    float multiplier = 1.f / length(value);
-    return quaternion(value.x * multiplier, value.y * multiplier, value.z * multiplier, value.w * multiplier);
-}
-
-constexpr quaternion transpose(const quaternion& value) {
-    return quaternion(-value.x, -value.y, -value.z, value.w);
-}
-
-constexpr quaternion inverse(const quaternion& value) {
-    float divisor = square_length(value);
-    float multiplier = 1.f / divisor;
-    quaternion transposed = transpose(value);
-
-    return quaternion(transposed.x * multiplier, 
-                      transposed.y * multiplier, 
-                      transposed.z * multiplier, 
-                      transposed.w * multiplier);
-}
-
-inline quaternion slerp(const quaternion& from, const quaternion& to, float factor) {
-    factor = factor * 0.5f;
-
-    float a = std::acos(from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w);
-    if (a < 0.f) {
-        a = -a;
-    }
-
-    float b = 1.f / std::sin(a);
-    float c = std::sin((1 - factor) * a) * b;
-    float d = std::sin(factor * a) * b;
-
-    return normalize(quaternion(
-        c * from.x + d * to.x,
-        c * from.y + d * to.y,
-        c * from.z + d * to.z,
-        c * from.w + d * to.w
-    ));
-}
-
-constexpr bool equal(const quaternion& lhs, const quaternion& rhs, float epsilon = EPSILON) {
-    return equal(lhs.x, rhs.x, epsilon) &&
-           equal(lhs.y, rhs.y, epsilon) &&
-           equal(lhs.z, rhs.z, epsilon) &&
-           equal(lhs.w, rhs.w, epsilon);
-}
-
-inline bool isfinite(const quaternion& value) {
-    return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z) && std::isfinite(value.w);
 }
 
 float3 sample_hemisphere(const float2& random);
