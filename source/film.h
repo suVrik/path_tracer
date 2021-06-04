@@ -1,10 +1,6 @@
 #pragma once
 
-// TODO
-//#include "filter.h"
-
 #include "maths.h"
-#include "spinlock.h"
 
 #include <memory>
 
@@ -31,12 +27,8 @@ private:
     };
 
     struct Tile {
-        mutable Spinlock spinlock;
         Pixel pixels[TILE_SIZE][TILE_SIZE];
     };
 
     std::unique_ptr<Tile[]> m_tiles;
-
-    // TODO
-    //GaussianFilter m_filter = GaussianFilter(0.75f);
 };
