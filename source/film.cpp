@@ -3,7 +3,7 @@
 #include <cassert>
 #include <mutex>
 
-static float gamme_correct(float value) {
+static float gamma_correct(float value) {
     if (value <= 0.0031308f) {
         return 12.92f * value;
     }
@@ -12,7 +12,7 @@ static float gamme_correct(float value) {
 }
 
 static float convert(float value) {
-    return static_cast<char>(clamp(gamme_correct(value), 0.f, 1.f) * 255.f + 0.5f);
+    return static_cast<char>(clamp(gamma_correct(value), 0.f, 1.f) * 255.f + 0.5f);
 }
 
 Film::Film(int width, int height)

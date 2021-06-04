@@ -1,6 +1,7 @@
 #include "geometry/box_geometry.h"
 #include "geometry/sphere_geometry.h"
 #include "integrator/bidirectional_path_tracer_integrator.h"
+#include "integrator/path_tracer_integrator.h"
 #include "material/diffuse_material.h"
 #include "material/emissive_material.h"
 #include "material/specular_reflective_material.h"
@@ -133,7 +134,7 @@ int main(int arc, char* argv[]) {
     SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     assert(texture != nullptr);
 
-    auto integrator = std::make_unique<BidirectionalPathTracerIntegrator>(TEXTURE_WIDTH, TEXTURE_HEIGHT, SAMPLES_PER_PIXEL, DIFFUSE_BOUNCES_MAX, SPECULAR_BOUNCES_MAX, build_scene());
+    auto integrator = std::make_unique<PathTracerIntegrator>(TEXTURE_WIDTH, TEXTURE_HEIGHT, SAMPLES_PER_PIXEL, DIFFUSE_BOUNCES_MAX, SPECULAR_BOUNCES_MAX, build_scene());
     assert(integrator != nullptr);
 
     while (poll_events()) {
