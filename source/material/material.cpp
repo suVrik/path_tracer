@@ -54,8 +54,8 @@ bool refract(const float3& incident, const float3& normal, float ior, float3& tr
 
 float3 Material::bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
     assert(equal(length(outgoing), 1.f));
-    assert(random[0] >= 0.f && random[0] <= 1.f);
-    assert(random[1] >= 0.f && random[1] <= 1.f);
+    assert(random[0] >= 0.f && random[0] < 1.f);
+    assert(random[1] >= 0.f && random[1] < 1.f);
 
     ingoing = float3(-outgoing.x, -outgoing.y, outgoing.z);
 

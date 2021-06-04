@@ -10,8 +10,8 @@ SpecularReflectiveMaterial::SpecularReflectiveMaterial(float ior)
 
 float3 SpecularReflectiveMaterial::bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
     assert(equal(length(outgoing), 1.f));
-    assert(random[0] >= 0.f && random[0] <= 1.f);
-    assert(random[1] >= 0.f && random[1] <= 1.f);
+    assert(random[0] >= 0.f && random[0] < 1.f);
+    assert(random[1] >= 0.f && random[1] < 1.f);
 
     if (outgoing.z < EPSILON) {
         return float3();

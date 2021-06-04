@@ -43,8 +43,8 @@ std::optional<GeometryHit> SphereGeometry::raycast(const float3& origin, const f
 }
 
 GeometrySample SphereGeometry::sample(const float2& random) const {
-    assert(random[0] >= 0.f && random[0] <= 1.f);
-    assert(random[1] >= 0.f && random[1] <= 1.f);
+    assert(random[0] >= 0.f && random[0] < 1.f);
+    assert(random[1] >= 0.f && random[1] < 1.f);
 
     float z = 1.f - 2.f * random[0];
     float r = std::sqrt(std::max(0.f, 1.f - sqr(z)));

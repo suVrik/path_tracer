@@ -95,8 +95,8 @@ static const GeometrySample BOX_SAMPLES[6] = {
 };
 
 GeometrySample BoxGeometry::sample(const float2& random) const {
-    assert(random[0] >= 0.f && random[0] <= 1.f);
-    assert(random[1] >= 0.f && random[1] <= 1.f);
+    assert(random[0] >= 0.f && random[0] < 1.f);
+    assert(random[1] >= 0.f && random[1] < 1.f);
 
     int side_index = static_cast<int>(random[0] * 6);
     assert(side_index >= 0 && side_index < 6);

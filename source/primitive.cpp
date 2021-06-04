@@ -1,6 +1,4 @@
 #include "primitive.h"
-#include "geometry.h"
-#include "material.h"
 
 #include <cassert>
 
@@ -8,7 +6,8 @@ Primitive::Primitive(std::shared_ptr<Geometry> geometry, std::shared_ptr<Materia
     : m_geometry(std::move(geometry))
     , m_material(std::move(material))
     , m_transform(transform)
-    , m_inv_transform(inverse(transform)) {
+    , m_inv_transform(inverse(transform))
+{
     assert(m_geometry != nullptr);
     assert(m_material != nullptr);
 }
@@ -83,6 +82,7 @@ GeometrySample Primitive::geometry_sample(const float2& random) const {
 float Primitive::geometry_area() const {
     float result = m_geometry->area();
 
+    assert(std::isfinite(result));
     assert(result >= 0.f);
 
     return result;
@@ -107,6 +107,7 @@ float3 Primitive::material_bsdf(const float3& ingoing, const float3& outgoing) c
 
     float3 result = m_material->bsdf(ingoing, outgoing);
 
+    assert(isfinite(result));
     assert(result.x >= 0.f && result.y >= 0.f && result.z >= 0.f);
 
     return result;
@@ -115,6 +116,7 @@ float3 Primitive::material_bsdf(const float3& ingoing, const float3& outgoing) c
 float3 Primitive::material_emissive() const {
     float3 result = m_material->emissive();
 
+    assert(isfinite(result));
     assert(result.r >= 0.f && result.g >= 0.f && result.b >= 0.f);
 
     return result;

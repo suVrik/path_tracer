@@ -10,8 +10,8 @@ DiffuseMaterial::DiffuseMaterial(const float3& albedo)
 
 float3 DiffuseMaterial::bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
     assert(equal(length(outgoing), 1.f));
-    assert(random[0] >= 0.f && random[0] <= 1.f);
-    assert(random[1] >= 0.f && random[1] <= 1.f);
+    assert(random[0] >= 0.f && random[0] < 1.f);
+    assert(random[1] >= 0.f && random[1] < 1.f);
 
     if (outgoing.z < EPSILON) {
         ingoing = float3(0.f, 0.f, -1.f);

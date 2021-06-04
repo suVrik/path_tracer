@@ -1,8 +1,7 @@
 #pragma once
 
-#include "geometry.h"
-#include "material.h"
-#include "maths.h"
+#include "geometry/geometry.h"
+#include "material/material.h"
 
 #include <memory>
 
