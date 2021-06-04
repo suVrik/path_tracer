@@ -11,7 +11,6 @@ public:
     float rand();
     float2 rand2();
     float3 rand3();
-    float4 rand4();
 
 private:
     static constexpr int N = 624;

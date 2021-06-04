@@ -50,7 +50,3 @@ float2 Random::rand2() {
 float3 Random::rand3() {
     return float3(rand(), rand(), rand());
 }
-
-float4 Random::rand4() {
-    return float4(rand(), rand(), rand(), rand());
-}
