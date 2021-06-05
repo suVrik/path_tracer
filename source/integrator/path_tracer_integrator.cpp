@@ -39,10 +39,11 @@ void PathTracerIntegrator::integrate(int thread_index) {
     Random random(thread_index);
 
     int tiles_total = m_film.tiles_x * m_film.tiles_y;
-    int tiles_per_thread = (tiles_total + m_thread_count - 1) / m_thread_count;
+    int tiles_per_thread = tiles_total / m_thread_count;
+    int threads_with_extra_tile = tiles_total % m_thread_count;
 
-    int begin_tile_index = std::min(tiles_total, thread_index * tiles_per_thread);
-    int end_tile_index = std::min(tiles_total, (thread_index + 1) * tiles_per_thread);
+    int begin_tile_index = thread_index * tiles_per_thread + std::min(thread_index, threads_with_extra_tile);
+    int end_tile_index = (thread_index + 1) * tiles_per_thread + std::min(thread_index + 1, threads_with_extra_tile);
     int current_tile_index = 0;
 
     int tiles_count = end_tile_index - begin_tile_index;
@@ -50,7 +51,7 @@ void PathTracerIntegrator::integrate(int thread_index) {
     float4x4 projection = float4x4::perspective(radians(30.0), static_cast<double>(m_film.width) / m_film.height, 1.0, 10.0);
     float4x4 inv_projection = inverse(projection);
 
-    while (tiles_count > 0 && current_tile_index / tiles_count < m_samples_per_pixel) {
+    while (current_tile_index / tiles_count < m_samples_per_pixel) {
         int tile_index = begin_tile_index + (current_tile_index++) % tiles_count;
 
         int tile_x = tile_index % m_film.tiles_x;

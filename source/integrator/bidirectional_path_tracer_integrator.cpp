@@ -56,10 +56,11 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
     Random random(thread_index);
 
     int tiles_total = m_film.tiles_x * m_film.tiles_y;
-    int tiles_per_thread = (tiles_total + m_thread_count - 1) / m_thread_count;
+    int tiles_per_thread = tiles_total / m_thread_count;
+    int threads_with_extra_tile = tiles_total % m_thread_count;
 
-    int begin_tile_index = thread_index * tiles_per_thread;
-    int end_tile_index = std::min(tiles_total, (thread_index + 1) * tiles_per_thread);
+    int begin_tile_index = thread_index * tiles_per_thread + std::min(thread_index, threads_with_extra_tile);
+    int end_tile_index = (thread_index + 1) * tiles_per_thread + std::min(thread_index + 1, threads_with_extra_tile);
     int current_tile_index = 0;
 
     int tiles_count = end_tile_index - begin_tile_index;
