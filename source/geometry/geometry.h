@@ -9,7 +9,7 @@ struct GeometryHit {
     float3 tangent;
     float3 bitangent;
     float3 normal;
-    float distance;
+    double distance;
 };
 
 struct GeometrySample {
@@ -23,9 +23,9 @@ class Geometry {
 public:
     virtual ~Geometry() = default;
 
-    virtual std::optional<GeometryHit> raycast(const float3& origin, const float3& direction, float length) const = 0;
+    virtual std::optional<GeometryHit> raycast(const float3& origin, const float3& direction, double length) const = 0;
 
     virtual GeometrySample sample(const float2& random) const = 0;
 
-    virtual float area() const = 0;
+    virtual double area() const = 0;
 };

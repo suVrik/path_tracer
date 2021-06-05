@@ -5,36 +5,36 @@
 BoxGeometry::BoxGeometry(float3 half_extents)
     : m_half_extents(half_extents)
 {
-    assert(half_extents.x > 0.f);
-    assert(half_extents.y > 0.f);
-    assert(half_extents.z > 0.f);
+    assert(half_extents.x > 0.0);
+    assert(half_extents.y > 0.0);
+    assert(half_extents.z > 0.0);
 }
 
-std::optional<GeometryHit> BoxGeometry::raycast(const float3& origin, const float3& direction, float length) const {
+std::optional<GeometryHit> BoxGeometry::raycast(const float3& origin, const float3& direction, double length) const {
     assert(isfinite(origin));
-    assert(equal(::length(direction), 1.f));
-    assert(length > 0.f);
+    assert(equal(::length(direction), 1.0));
+    assert(length > 0.0);
 
-    float near = 0.f;
+    double near = 0.0;
     int near_normal_index = 0;
-    float near_normal_sign = 1.f;
+    double near_normal_sign = 1.0;
 
-    float far = length;
+    double far = length;
     int far_normal_index = 0;
-    float far_normal_sign = 1.f;
+    double far_normal_sign = 1.0;
 
     for (int i = 0; i < 3; i++) {
-        float inverse_direction = 1.f / direction[i];
+        double inverse_direction = 1.0 / direction[i];
 
-        float t1 = (m_half_extents[i] - origin[i]) * inverse_direction;
-        float t2 = (-m_half_extents[i] - origin[i]) * inverse_direction;
+        double t1 = (m_half_extents[i] - origin[i]) * inverse_direction;
+        double t2 = (-m_half_extents[i] - origin[i]) * inverse_direction;
 
-        float normal_sign = 1.f;
+        double normal_sign = 1.0;
 
         if (t1 > t2) {
             std::swap(t1, t2);
 
-            normal_sign = -1.f;
+            normal_sign = -1.0;
         }
 
         if (t1 > near) {
@@ -62,7 +62,7 @@ std::optional<GeometryHit> BoxGeometry::raycast(const float3& origin, const floa
         near_normal_sign = -far_normal_sign;
     }
 
-    if (equal(near, 0.f)) {
+    if (equal(near, 0.0)) {
         return std::nullopt;
     }
 
@@ -72,43 +72,43 @@ std::optional<GeometryHit> BoxGeometry::raycast(const float3& origin, const floa
 
     GeometryHit hit;
     hit.position = origin + direction * near;
-    hit.tangent[normal_index] = 0.f;
-    hit.tangent[tangent_index] = 1.f;
-    hit.tangent[bitangent_index] = 0.f;
-    hit.bitangent[normal_index] = 0.f;
-    hit.bitangent[tangent_index] = 0.f;
-    hit.bitangent[bitangent_index] = 1.f;
+    hit.tangent[normal_index] = 0.0;
+    hit.tangent[tangent_index] = 1.0;
+    hit.tangent[bitangent_index] = 0.0;
+    hit.bitangent[normal_index] = 0.0;
+    hit.bitangent[tangent_index] = 0.0;
+    hit.bitangent[bitangent_index] = 1.0;
     hit.normal[normal_index] = near_normal_sign;
-    hit.normal[tangent_index] = 0.f;
-    hit.normal[bitangent_index] = 0.f;
+    hit.normal[tangent_index] = 0.0;
+    hit.normal[bitangent_index] = 0.0;
     hit.distance = near;
     return hit;
 }
 
 static const GeometrySample BOX_SAMPLES[6] = {
-    { float3(), float3(0.f, 1.f, 0.f), float3(0.f, 0.f, 1.f), float3(1.f, 0.f, 0.f)  },
-    { float3(), float3(0.f, 1.f, 0.f), float3(0.f, 0.f, 1.f), float3(-1.f, 0.f, 0.f) },
-    { float3(), float3(0.f, 0.f, 1.f), float3(1.f, 0.f, 0.f), float3(0.f, 1.f, 0.f)  },
-    { float3(), float3(0.f, 0.f, 1.f), float3(1.f, 0.f, 0.f), float3(0.f, -1.f, 0.f) },
-    { float3(), float3(1.f, 0.f, 0.f), float3(0.f, 1.f, 0.f), float3(0.f, 0.f, 1.f)  },
-    { float3(), float3(1.f, 0.f, 0.f), float3(0.f, 1.f, 0.f), float3(0.f, 0.f, -1.f) },
+    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0)  },
+    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3(-1.0, 0.0, 0.0) },
+    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0)  },
+    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0) },
+    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0)  },
+    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, -1.0) },
 };
 
 GeometrySample BoxGeometry::sample(const float2& random) const {
-    assert(random[0] >= 0.f && random[0] < 1.f);
-    assert(random[1] >= 0.f && random[1] < 1.f);
+    assert(random[0] >= 0.0 && random[0] < 1.0);
+    assert(random[1] >= 0.0 && random[1] < 1.0);
 
     int side_index = static_cast<int>(random[0] * 6);
     assert(side_index >= 0 && side_index < 6);
 
-    float u = lerp(-1.f, 1.f, clamp(random[0] * 6.f - side_index, 0.f, 1.f));
-    float v = lerp(-1.f, 1.f, random[1]);
+    double u = lerp(-1.0, 1.0, clamp(random[0] * 6.0 - side_index, 0.0, 1.0));
+    double v = lerp(-1.0, 1.0, random[1]);
 
     GeometrySample result = BOX_SAMPLES[side_index];
     result.position = m_half_extents * (result.normal + u * result.tangent + v * result.bitangent);
     return result;
 }
 
-float BoxGeometry::area() const {
-    return (m_half_extents.x * m_half_extents.y + m_half_extents.x * m_half_extents.z + m_half_extents.y * m_half_extents.z) * 2.f;
+double BoxGeometry::area() const {
+    return (m_half_extents.x * m_half_extents.y + m_half_extents.x * m_half_extents.z + m_half_extents.y * m_half_extents.z) * 2.0;
 }
