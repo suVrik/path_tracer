@@ -10,6 +10,10 @@ public:
     float2 rand2();
     float3 rand3();
 
+    double rand(int sample, int total_samples);
+    float2 rand2(int sample, int total_samples);
+    float3 rand3(int sample, int total_samples);
+
 private:
     static constexpr int N = 624;
     static constexpr int M = 397;

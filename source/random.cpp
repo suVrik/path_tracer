@@ -50,3 +50,23 @@ float2 Random::rand2() {
 float3 Random::rand3() {
     return float3(rand(), rand(), rand());
 }
+
+double Random::rand(int sample, int total_samples) {
+    return (sample + rand()) / total_samples;
+}
+
+float2 Random::rand2(int sample, int total_samples) {
+    int axis = static_cast<int>(std::sqrt(total_samples));
+    if (sample < axis * axis) {
+        return float2(rand(sample % axis, axis), rand(sample / axis, axis));
+    }
+    return rand2();
+}
+
+float3 Random::rand3(int sample, int total_samples) {
+    int axis = static_cast<int>(std::pow(total_samples, 1.0 / 3.0));
+    if (sample < axis * axis * axis) {
+        return float3(rand(sample % axis, axis), rand(sample / axis % axis, axis), rand(sample / axis / axis, axis));
+    }
+    return rand3();
+}

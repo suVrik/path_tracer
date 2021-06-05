@@ -3,7 +3,7 @@
 #include <cmath>
 
 constexpr double PI      = 3.14159265359;
-constexpr double EPSILON = 1e-6;
+constexpr double EPSILON = 1e-14;
 
 constexpr double sqr(double value) {
     return value * value;

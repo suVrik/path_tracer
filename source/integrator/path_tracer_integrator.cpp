@@ -52,7 +52,10 @@ void PathTracerIntegrator::integrate(int thread_index) {
     float4x4 inv_projection = inverse(projection);
 
     while (current_tile_index / tiles_count < m_samples_per_pixel) {
-        int tile_index = begin_tile_index + (current_tile_index++) % tiles_count;
+        int temp = current_tile_index++;
+
+        int sample_index = temp / tiles_count;
+        int tile_index = begin_tile_index + temp % tiles_count;
 
         int tile_x = tile_index % m_film.tiles_x;
         int tile_y = tile_index / m_film.tiles_x;
@@ -65,8 +68,10 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
         for (int y = 0; y < tile_height; y++) {
             for (int x = 0; x < tile_width; x++) {
-                double screen_x = x_from + x + random.rand();
-                double screen_y = y_from + y + random.rand();
+                float2 offset = random.rand2();
+
+                double screen_x = x_from + x + offset.x;
+                double screen_y = y_from + y + offset.y;
                 
                 double normalized_x = screen_x * 2.0 / m_film.width - 1.0;
                 double normalized_y = 1.0 - screen_y * 2.0 / m_film.height;
@@ -93,8 +98,15 @@ void PathTracerIntegrator::integrate(int thread_index) {
                         
                     float3 outgoing_tangent_space = normalize((-outgoing) * tangent_space);
 
+                    float2 u;
+                    if (diffuse_bounces == 0) {
+                        u = random.rand2(sample_index, m_samples_per_pixel);
+                    } else {
+                        u = random.rand2();
+                    }
+
                     float3 ingoing_tangent_space;
-                    float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random.rand2());
+                    float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, u);
                     if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
                         break;
                     }
