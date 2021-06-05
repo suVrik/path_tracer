@@ -2,58 +2,58 @@
 
 #include <cmath>
 
-constexpr float PI      = 3.14159265359f;
-constexpr float EPSILON = 1e-6f;
+constexpr double PI      = 3.14159265359;
+constexpr double EPSILON = 1e-6;
 
-constexpr float sqr(float value) {
+constexpr double sqr(double value) {
     return value * value;
 }
 
-constexpr float lerp(float from, float to, float factor) {
+constexpr double lerp(double from, double to, double factor) {
     return from + (to - from) * factor;
 }
 
-constexpr float clamp(float value, float min, float max) {
+constexpr double clamp(double value, double min, double max) {
     return value < min ? min : (max < value ? max : value);
 }
 
-constexpr float equal(float a, float b, float epsilon = EPSILON) {
+constexpr double equal(double a, double b, double epsilon = EPSILON) {
     return a - b > -epsilon && a - b < epsilon;
 }
 
-constexpr float degrees(float radians) {
-    return radians / PI * 180.f;
+constexpr double degrees(double radians) {
+    return radians / PI * 180.0;
 }
 
-constexpr float radians(float degrees) {
-    return degrees / 180.f * PI;
+constexpr double radians(double degrees) {
+    return degrees / 180.0 * PI;
 }
 
 class float2 {
 public:
-    explicit constexpr float2(float all = 0.f)
+    explicit constexpr float2(double all = 0.0)
         : x(all), y(all)
     {
     }
     
-    explicit constexpr float2(float x, float y) 
+    explicit constexpr float2(double x, double y) 
         : x(x), y(y)
     {
     }
 
-    constexpr float* begin() {
+    constexpr double* begin() {
         return data;
     }
 
-    constexpr const float* begin() const {
+    constexpr const double* begin() const {
         return data;
     }
 
-    constexpr float* end() {
+    constexpr double* end() {
         return data + 2;
     }
 
-    constexpr const float* end() const {
+    constexpr const double* end() const {
         return data + 2;
     }
 
@@ -101,25 +101,25 @@ public:
         return *this;
     }
 
-    constexpr float2& operator*=(float value) {
+    constexpr float2& operator*=(double value) {
         x *= value;
         y *= value;
 
         return *this;
     }
 
-    constexpr float2& operator/=(float value) {
+    constexpr float2& operator/=(double value) {
         x /= value;
         y /= value;
 
         return *this;
     }
 
-    constexpr float& operator[](size_t index) {
+    constexpr double& operator[](size_t index) {
         return data[index];
     }
 
-    constexpr const float& operator[](size_t index) const {
+    constexpr const double& operator[](size_t index) const {
         return data[index];
     }
 
@@ -127,11 +127,11 @@ public:
         return float2(-x, -y);
     }
 
-    constexpr float2 operator*(float rhs) const {
+    constexpr float2 operator*(double rhs) const {
         return float2(x * rhs, y * rhs);
     }
 
-    constexpr float2 operator/(float rhs) const {
+    constexpr float2 operator/(double rhs) const {
         return float2(x / rhs, y / rhs);
     }
 
@@ -143,61 +143,61 @@ public:
         return x != value.x || y != value.y;
     }
 
-    constexpr float* operator&() {
+    constexpr double* operator&() {
         return data;
     }
 
-    constexpr const float* operator&() const {
+    constexpr const double* operator&() const {
         return data;
     }
 
-    friend constexpr float2 operator*(float lhs, const float2& rhs) {
+    friend constexpr float2 operator*(double lhs, const float2& rhs) {
         return rhs * lhs;
     }
 
     union {
         struct {
-            float x, y;
+            double x, y;
         };
 
         struct {
-            float r, g;
+            double r, g;
         };
 
-        float data[2];
+        double data[2];
     };
 };
 
-constexpr float dot(const float2& lhs, const float2& rhs) {
+constexpr double dot(const float2& lhs, const float2& rhs) {
     return lhs.x * rhs.x + lhs.y * rhs.y;
 }
 
-constexpr float square_length(const float2& value) {
+constexpr double square_length(const float2& value) {
     return sqr(value.x) + sqr(value.y);
 }
 
-inline float length(const float2& value) {
+inline double length(const float2& value) {
     return std::sqrt(square_length(value));
 }
 
-constexpr float square_distance(const float2& lhs, const float2& rhs) {
+constexpr double square_distance(const float2& lhs, const float2& rhs) {
     return sqr(lhs.x - rhs.x) + sqr(lhs.y - rhs.y);
 }
 
-inline float distance(const float2& lhs, const float2& rhs) {
+inline double distance(const float2& lhs, const float2& rhs) {
     return std::sqrt(square_distance(lhs, rhs));
 }
 
 inline float2 normalize(const float2& value) {
-    float multiplier = 1.f / length(value);
+    double multiplier = 1.0 / length(value);
     return float2(value.x * multiplier, value.y * multiplier);
 }
 
-constexpr float2 lerp(const float2& from, const float2& to, float factor) {
+constexpr float2 lerp(const float2& from, const float2& to, double factor) {
     return from + (to - from) * factor;
 }
 
-constexpr float2 clamp(const float2& value, float min, float max) {
+constexpr float2 clamp(const float2& value, double min, double max) {
     return float2(clamp(value.x, min, max), clamp(value.y, min, max));
 }
 
@@ -206,14 +206,14 @@ constexpr float2 clamp(const float2& value, const float2& min, const float2& max
 }
 
 inline float2 reflect(const float2& vector, const float2& normal) {
-    return vector - 2.f * dot(vector, normal) * normal;
+    return vector - 2.0 * dot(vector, normal) * normal;
 }
 
-constexpr bool equal(const float2& lhs, const float2& rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float2& lhs, const float2& rhs, double epsilon = EPSILON) {
     return equal(lhs.x, rhs.x, epsilon) && equal(lhs.y, rhs.y, epsilon);
 }
 
-constexpr bool equal(const float2& lhs, float rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float2& lhs, double rhs, double epsilon = EPSILON) {
     return equal(lhs.x, rhs, epsilon) && equal(lhs.y, rhs, epsilon);
 }
 
@@ -223,35 +223,35 @@ inline bool isfinite(const float2& value) {
 
 class float3 {
 public:
-    explicit constexpr float3(float all = 0.f)
+    explicit constexpr float3(double all = 0.0)
         : x(all), y(all), z(all)
     {
     }
 
 
-    explicit constexpr float3(float x, float y, float z)
+    explicit constexpr float3(double x, double y, double z)
         : x(x), y(y), z(z)
     {
     }
 
-    explicit constexpr float3(const float2& value, float z)
+    explicit constexpr float3(const float2& value, double z)
         : x(value.x), y(value.y), z(z)
     {
     }
 
-    constexpr float* begin() {
+    constexpr double* begin() {
         return data;
     }
 
-    constexpr const float* begin() const {
+    constexpr const double* begin() const {
         return data;
     }
 
-    constexpr float* end() {
+    constexpr double* end() {
         return data + 3;
     }
 
-    constexpr const float* end() const {
+    constexpr const double* end() const {
         return data + 3;
     }
 
@@ -303,7 +303,7 @@ public:
         return *this;
     }
 
-    constexpr float3& operator*=(float value) {
+    constexpr float3& operator*=(double value) {
         x *= value;
         y *= value;
         z *= value;
@@ -311,7 +311,7 @@ public:
         return *this;
     }
 
-    constexpr float3& operator/=(float value) {
+    constexpr float3& operator/=(double value) {
         x /= value;
         y /= value;
         z /= value;
@@ -319,11 +319,11 @@ public:
         return *this;
     }
 
-    constexpr float& operator[](size_t index) {
+    constexpr double& operator[](size_t index) {
         return data[index];
     }
 
-    constexpr const float& operator[](size_t index) const {
+    constexpr const double& operator[](size_t index) const {
         return data[index];
     }
 
@@ -331,11 +331,11 @@ public:
         return float3(-x, -y, -z);
     }
 
-    constexpr float3 operator*(float rhs) const {
+    constexpr float3 operator*(double rhs) const {
         return float3(x * rhs, y * rhs, z * rhs);
     }
 
-    constexpr float3 operator/(float rhs) const {
+    constexpr float3 operator/(double rhs) const {
         return float3(x / rhs, y / rhs, z / rhs);
     }
 
@@ -347,11 +347,11 @@ public:
         return x != value.x || y != value.y || z != value.z;
     }
 
-    constexpr float* operator&() {
+    constexpr double* operator&() {
         return data;
     }
 
-    constexpr const float* operator&() const {
+    constexpr const double* operator&() const {
         return data;
     }
 
@@ -359,24 +359,24 @@ public:
         return float2(x, y);
     }
 
-    friend constexpr float3 operator*(float lhs, const float3& rhs) {
+    friend constexpr float3 operator*(double lhs, const float3& rhs) {
         return rhs * lhs;
     }
 
     union {
         struct {
-            float x, y, z;
+            double x, y, z;
         };
 
         struct {
-            float r, g, b;
+            double r, g, b;
         };
 
-        float data[3];
+        double data[3];
     };
 };
 
-constexpr float dot(const float3& lhs, const float3& rhs) {
+constexpr double dot(const float3& lhs, const float3& rhs) {
     return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
 }
 
@@ -386,32 +386,32 @@ constexpr float3 cross(const float3& lhs, const float3& rhs) {
                   lhs.x * rhs.y - lhs.y * rhs.x);
 }
 
-constexpr float square_length(const float3& value) {
+constexpr double square_length(const float3& value) {
     return sqr(value.x) + sqr(value.y) + sqr(value.z);
 }
 
-inline float length(const float3& value) {
+inline double length(const float3& value) {
     return std::sqrt(square_length(value));
 }
 
-constexpr float square_distance(const float3& lhs, const float3& rhs) {
+constexpr double square_distance(const float3& lhs, const float3& rhs) {
     return sqr(lhs.x - rhs.x) + sqr(lhs.y - rhs.y) + sqr(lhs.z - rhs.z);
 }
 
-inline float distance(const float3& lhs, const float3& rhs) {
+inline double distance(const float3& lhs, const float3& rhs) {
     return std::sqrt(square_distance(lhs, rhs));
 }
 
 inline float3 normalize(const float3& value) {
-    float multiplier = 1.f / length(value);
+    double multiplier = 1.0 / length(value);
     return float3(value.x * multiplier, value.y * multiplier, value.z * multiplier);
 }
 
-constexpr float3 lerp(const float3& from, const float3& to, float factor) {
+constexpr float3 lerp(const float3& from, const float3& to, double factor) {
     return from + (to - from) * factor;
 }
 
-constexpr float3 clamp(const float3& value, float min, float max) {
+constexpr float3 clamp(const float3& value, double min, double max) {
     return float3(clamp(value.x, min, max), clamp(value.y, min, max), clamp(value.z, min, max));
 }
 
@@ -420,14 +420,14 @@ constexpr float3 clamp(const float3& value, const float3& min, const float3& max
 }
 
 inline float3 reflect(const float3& vector, const float3& normal) {
-    return vector - 2.f * dot(vector, normal) * normal;
+    return vector - 2.0 * dot(vector, normal) * normal;
 }
 
-constexpr bool equal(const float3& lhs, const float3& rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float3& lhs, const float3& rhs, double epsilon = EPSILON) {
     return equal(lhs.x, rhs.x, epsilon) && equal(lhs.y, rhs.y, epsilon) && equal(lhs.z, rhs.z, epsilon);
 }
 
-constexpr bool equal(const float3& lhs, float rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float3& lhs, double rhs, double epsilon = EPSILON) {
     return equal(lhs.x, rhs, epsilon) && equal(lhs.y, rhs, epsilon) && equal(lhs.z, rhs, epsilon);
 }
 
@@ -438,13 +438,13 @@ inline bool isfinite(const float3& value) {
 class float2x2 {
 public:
     explicit constexpr float2x2()
-        : _11(1.f), _12(0.f)
-        , _21(0.f), _22(1.f)
+        : _11(1.0), _12(0.0)
+        , _21(0.0), _22(1.0)
     {
     }
 
-    explicit constexpr float2x2(float _11, float _12,
-                                float _21, float _22)
+    explicit constexpr float2x2(double _11, double _12,
+                                double _21, double _22)
         : _11(_11), _12(_12)
         , _21(_21), _22(_22)
     {
@@ -455,19 +455,19 @@ public:
     {
     }
 
-    constexpr float* begin() {
+    constexpr double* begin() {
         return cells;
     }
 
-    constexpr const float* begin() const {
+    constexpr const double* begin() const {
         return cells;
     }
 
-    constexpr float* end() {
+    constexpr double* end() {
         return cells + 4;
     }
 
-    constexpr const float* end() const {
+    constexpr const double* end() const {
         return cells + 4;
     }
 
@@ -517,7 +517,7 @@ public:
         return *this = temp;
     }
 
-    constexpr float2x2& operator*=(float value) {
+    constexpr float2x2& operator*=(double value) {
         _11 *= value;
         _12 *= value;
         _21 *= value;
@@ -526,7 +526,7 @@ public:
         return *this;
     }
 
-    constexpr float2x2& operator/=(float value) {
+    constexpr float2x2& operator/=(double value) {
         _11 /= value;
         _12 /= value;
         _21 /= value;
@@ -553,11 +553,11 @@ public:
                       _21 * rhs.x + _22 * rhs.y);
     }
 
-    constexpr float2x2 operator*(float rhs) const {
+    constexpr float2x2 operator*(double rhs) const {
         return float2x2(_11 * rhs, _12 * rhs, _21 * rhs, _22 * rhs);
     }
 
-    constexpr float2x2 operator/(float rhs) const {
+    constexpr float2x2 operator/(double rhs) const {
         return float2x2(_11 / rhs, _12 / rhs, _21 / rhs, _22 / rhs);
     }
 
@@ -571,11 +571,11 @@ public:
                _21 != value._21 || _22 != value._22;
     }
 
-    constexpr float* operator&() {
+    constexpr double* operator&() {
         return cells;
     }
 
-    constexpr const float* operator&() const {
+    constexpr const double* operator&() const {
         return cells;
     }
 
@@ -584,19 +584,19 @@ public:
                       lhs.x * rhs._12 + lhs.y * rhs._22);
     }
 
-    friend constexpr float2x2 operator*(float lhs, const float2x2& rhs) {
+    friend constexpr float2x2 operator*(double lhs, const float2x2& rhs) {
         return rhs * lhs;
     }
 
     union {
         struct {
-            float _m00, _m01;
-            float _m10, _m11;
+            double _m00, _m01;
+            double _m10, _m11;
         };
 
         struct {
-            float _11, _12;
-            float _21, _22;
+            double _11, _12;
+            double _21, _22;
         };
 
         struct {
@@ -605,7 +605,7 @@ public:
         };
 
         float2 rows[2];
-        float cells[4];
+        double cells[4];
     };
 };
 
@@ -615,18 +615,18 @@ constexpr float2x2 transpose(const float2x2& value) {
 }
 
 constexpr float2x2 inverse(const float2x2& value) {
-    float det = value._11 * value._22 - value._12 * value._21;
+    double det = value._11 * value._22 - value._12 * value._21;
 
-    if (equal(det, 0.f)) {
+    if (equal(det, 0.0)) {
         return float2x2();
     }
 
-    float multiplier = 1.f / det;
+    double multiplier = 1.0 / det;
     return float2x2( value._22 * multiplier, -value._12 * multiplier,
                     -value._21 * multiplier,  value._11 * multiplier);
 }
 
-constexpr bool equal(const float2x2& lhs, const float2x2& rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float2x2& lhs, const float2x2& rhs, double epsilon = EPSILON) {
     return equal(lhs._11, rhs._11, epsilon) && equal(lhs._12, rhs._12, epsilon) &&
            equal(lhs._21, rhs._21, epsilon) && equal(lhs._22, rhs._22, epsilon);
 }
@@ -639,15 +639,15 @@ inline bool isfinite(const float2x2& value) {
 class float3x3 {
 public:
     explicit constexpr float3x3()
-        : _11(1.f), _12(0.f), _13(0.f)
-        , _21(0.f), _22(1.f), _23(0.f)
-        , _31(0.f), _32(0.f), _33(1.f)
+        : _11(1.0), _12(0.0), _13(0.0)
+        , _21(0.0), _22(1.0), _23(0.0)
+        , _31(0.0), _32(0.0), _33(1.0)
     {
     }
 
-    explicit constexpr float3x3(float _11, float _12, float _13,
-                                float _21, float _22, float _23,
-                                float _31, float _32, float _33)
+    explicit constexpr float3x3(double _11, double _12, double _13,
+                                double _21, double _22, double _23,
+                                double _31, double _32, double _33)
         : _11(_11), _12(_12), _13(_13)
         , _21(_21), _22(_22), _23(_23)
         , _31(_31), _32(_32), _33(_33)
@@ -655,9 +655,9 @@ public:
     }
 
     explicit constexpr float3x3(const float2x2& value)
-        : _11(value._11), _12(value._12), _13(0.f)
-        , _21(value._21), _22(value._22), _23(0.f)
-        , _31(0.f),       _32(0.f),       _33(1.f)
+        : _11(value._11), _12(value._12), _13(0.0)
+        , _21(value._21), _22(value._22), _23(0.0)
+        , _31(0.0),       _32(0.0),       _33(1.0)
     {
     }
 
@@ -666,19 +666,19 @@ public:
     {
     }
 
-    constexpr float* begin() {
+    constexpr double* begin() {
         return cells;
     }
 
-    constexpr const float* begin() const {
+    constexpr const double* begin() const {
         return cells;
     }
 
-    constexpr float* end() {
+    constexpr double* end() {
         return cells + 9;
     }
 
-    constexpr const float* end() const {
+    constexpr const double* end() const {
         return cells + 9;
     }
 
@@ -750,7 +750,7 @@ public:
         return *this = temp;
     }
 
-    constexpr float3x3& operator*=(float value) {
+    constexpr float3x3& operator*=(double value) {
         _11 *= value;
         _12 *= value;
         _13 *= value;
@@ -764,7 +764,7 @@ public:
         return *this;
     }
 
-    constexpr float3x3& operator/=(float value) {
+    constexpr float3x3& operator/=(double value) {
         _11 /= value;
         _12 /= value;
         _13 /= value;
@@ -792,7 +792,7 @@ public:
                         -_31, -_32, -_33);
     }
 
-    constexpr float3x3 operator*(float rhs) const {
+    constexpr float3x3 operator*(double rhs) const {
         return float3x3(_11 * rhs, _12 * rhs, _13 * rhs,
                         _21 * rhs, _22 * rhs, _23 * rhs,
                         _31 * rhs, _32 * rhs, _33 * rhs);
@@ -804,7 +804,7 @@ public:
                       _31 * rhs.x + _32 * rhs.y + _33 * rhs.z);
     }
 
-    constexpr float3x3 operator/(float rhs) const {
+    constexpr float3x3 operator/(double rhs) const {
         return float3x3(_11 / rhs, _12 / rhs, _13 / rhs,
                         _21 / rhs, _22 / rhs, _23 / rhs,
                         _31 / rhs, _32 / rhs, _33 / rhs);
@@ -822,15 +822,15 @@ public:
                _31 != value._31 || _32 != value._32 || _33 != value._33;
     }
 
-    constexpr float* operator&() {
+    constexpr double* operator&() {
         return cells;
     }
 
-    constexpr const float* operator&() const {
+    constexpr const double* operator&() const {
         return cells;
     }
 
-    friend constexpr float3x3 operator*(float lhs, const float3x3& rhs) {
+    friend constexpr float3x3 operator*(double lhs, const float3x3& rhs) {
         return rhs * lhs;
     }
 
@@ -842,15 +842,15 @@ public:
 
     union {
         struct {
-            float _m00, _m01, _m02;
-            float _m10, _m11, _m12;
-            float _m20, _m21, _m22;
+            double _m00, _m01, _m02;
+            double _m10, _m11, _m12;
+            double _m20, _m21, _m22;
         };
 
         struct {
-            float _11, _12, _13;
-            float _21, _22, _23;
-            float _31, _32, _33;
+            double _11, _12, _13;
+            double _21, _22, _23;
+            double _31, _32, _33;
         };
 
         struct {
@@ -860,7 +860,7 @@ public:
         };
 
         float3 rows[3];
-        float cells[9];
+        double cells[9];
     };
 };
 
@@ -881,12 +881,12 @@ constexpr float3x3 inverse(const float3x3& value) {
                     value._31 * value._12 - value._11 * value._32,
                     value._11 * value._22 - value._21 * value._12);
 
-    float det = value._11 * result._11 + value._21 * result._12 + value._31 * result._13;
-    if (equal(det, 0.f)) {
+    double det = value._11 * result._11 + value._21 * result._12 + value._31 * result._13;
+    if (equal(det, 0.0)) {
         return float3x3();
     }
 
-    float factor = 1.f / det;
+    double factor = 1.0 / det;
     result._11 *= factor;
     result._12 *= factor;
     result._13 *= factor;
@@ -900,7 +900,7 @@ constexpr float3x3 inverse(const float3x3& value) {
     return result;
 }
 
-constexpr bool equal(const float3x3& lhs, const float3x3& rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float3x3& lhs, const float3x3& rhs, double epsilon = EPSILON) {
     return equal(lhs._11, rhs._11, epsilon) &&
            equal(lhs._12, rhs._12, epsilon) &&
            equal(lhs._13, rhs._13, epsilon) &&
@@ -920,24 +920,24 @@ inline bool isfinite(const float3x3& value) {
 
 class float4x4 {
 public:
-    static float4x4 rotation(const float3& axis, float angle);
+    static float4x4 rotation(const float3& axis, double angle);
     static float4x4 scale(const float3& scale);
     static float4x4 translation(const float3& translation);
 
-    static float4x4 perspective(float fov_y, float aspect, float z_near, float z_far);
+    static float4x4 perspective(double fov_y, double aspect, double z_near, double z_far);
 
     explicit constexpr float4x4()
-        : _11(1.f), _12(0.f), _13(0.f), _14(0.f)
-        , _21(0.f), _22(1.f), _23(0.f), _24(0.f)
-        , _31(0.f), _32(0.f), _33(1.f), _34(0.f)
-        , _41(0.f), _42(0.f), _43(0.f), _44(1.f)
+        : _11(1.0), _12(0.0), _13(0.0), _14(0.0)
+        , _21(0.0), _22(1.0), _23(0.0), _24(0.0)
+        , _31(0.0), _32(0.0), _33(1.0), _34(0.0)
+        , _41(0.0), _42(0.0), _43(0.0), _44(1.0)
     {
     }
 
-    explicit constexpr float4x4(float _11, float _12, float _13, float _14,
-                                float _21, float _22, float _23, float _24,
-                                float _31, float _32, float _33, float _34,
-                                float _41, float _42, float _43, float _44)
+    explicit constexpr float4x4(double _11, double _12, double _13, double _14,
+                                double _21, double _22, double _23, double _24,
+                                double _31, double _32, double _33, double _34,
+                                double _41, double _42, double _43, double _44)
         : _11(_11), _12(_12), _13(_13), _14(_14)
         , _21(_21), _22(_22), _23(_23), _24(_24)
         , _31(_31), _32(_32), _33(_33), _34(_34)
@@ -946,34 +946,34 @@ public:
     }
 
     explicit constexpr float4x4(const float2x2& value)
-        : _11(value._11), _12(value._12), _13(0.f), _14(0.f)
-        , _21(value._21), _22(value._22), _23(0.f), _24(0.f)
-        , _31(0.f),       _32(0.f),       _33(1.f), _34(0.f)
-        , _41(0.f),       _42(0.f),       _43(0.f), _44(1.f)
+        : _11(value._11), _12(value._12), _13(0.0), _14(0.0)
+        , _21(value._21), _22(value._22), _23(0.0), _24(0.0)
+        , _31(0.0),       _32(0.0),       _33(1.0), _34(0.0)
+        , _41(0.0),       _42(0.0),       _43(0.0), _44(1.0)
     {
     }
 
     explicit constexpr float4x4(const float3x3& value)
-        : _11(value._11), _12(value._12), _13(value._13), _14(0.f)
-        , _21(value._21), _22(value._22), _23(value._23), _24(0.f)
-        , _31(value._31), _32(value._32), _33(value._33), _34(0.f)
-        , _41(0.f),       _42(0.f),       _43(0.f),       _44(1.f)
+        : _11(value._11), _12(value._12), _13(value._13), _14(0.0)
+        , _21(value._21), _22(value._22), _23(value._23), _24(0.0)
+        , _31(value._31), _32(value._32), _33(value._33), _34(0.0)
+        , _41(0.0),       _42(0.0),       _43(0.0),       _44(1.0)
     {
     }
 
-    constexpr float* begin() {
+    constexpr double* begin() {
         return cells;
     }
 
-    constexpr const float* begin() const {
+    constexpr const double* begin() const {
         return cells;
     }
 
-    constexpr float* end() {
+    constexpr double* end() {
         return cells + 16;
     }
 
-    constexpr const float* end() const {
+    constexpr const double* end() const {
         return cells + 16;
     }
 
@@ -1075,7 +1075,7 @@ public:
         return *this = temp;
     }
 
-    constexpr float4x4& operator*=(float value) {
+    constexpr float4x4& operator*=(double value) {
         _11 *= value;
         _12 *= value;
         _13 *= value;
@@ -1096,7 +1096,7 @@ public:
         return *this;
     }
 
-    constexpr float4x4& operator/=(float value) {
+    constexpr float4x4& operator/=(double value) {
         _11 /= value;
         _12 /= value;
         _13 /= value;
@@ -1124,7 +1124,7 @@ public:
                         -_41, -_42, -_43, -_44);
     }
 
-    constexpr float4x4 operator*(float rhs) const {
+    constexpr float4x4 operator*(double rhs) const {
         return float4x4(_11 * rhs, _12 * rhs, _13 * rhs, _14 * rhs,
                         _21 * rhs, _22 * rhs, _23 * rhs, _24 * rhs,
                         _31 * rhs, _32 * rhs, _33 * rhs, _34 * rhs,
@@ -1151,15 +1151,15 @@ public:
                _41 != value._41 || _42 != value._42 || _43 != value._43 || _44 != value._44;
     }
 
-    constexpr float* operator&() {
+    constexpr double* operator&() {
         return cells;
     }
 
-    constexpr const float* operator&() const {
+    constexpr const double* operator&() const {
         return cells;
     }
 
-    friend constexpr float4x4 operator*(float lhs, const float4x4& rhs) {
+    friend constexpr float4x4 operator*(double lhs, const float4x4& rhs) {
         return rhs * lhs;
     }
 
@@ -1171,20 +1171,20 @@ public:
 
     union {
         struct {
-            float _m00, _m01, _m02, _m03;
-            float _m10, _m11, _m12, _m13;
-            float _m20, _m21, _m22, _m23;
-            float _m30, _m31, _m32, _m33;
+            double _m00, _m01, _m02, _m03;
+            double _m10, _m11, _m12, _m13;
+            double _m20, _m21, _m22, _m23;
+            double _m30, _m31, _m32, _m33;
         };
 
         struct {
-            float _11, _12, _13, _14;
-            float _21, _22, _23, _24;
-            float _31, _32, _33, _34;
-            float _41, _42, _43, _44;
+            double _11, _12, _13, _14;
+            double _21, _22, _23, _24;
+            double _31, _32, _33, _34;
+            double _41, _42, _43, _44;
         };
 
-        float cells[16];
+        double cells[16];
     };
 };
 
@@ -1195,7 +1195,7 @@ constexpr float4x4 transpose(const float4x4& value) {
                     value._14, value._24, value._34, value._44);
 }
 
-constexpr float4x4 operator/(const float4x4& lhs, float rhs) {
+constexpr float4x4 operator/(const float4x4& lhs, double rhs) {
     return float4x4(lhs._11 / rhs, lhs._12 / rhs, lhs._13 / rhs, lhs._14 / rhs,
                     lhs._21 / rhs, lhs._22 / rhs, lhs._23 / rhs, lhs._24 / rhs,
                     lhs._31 / rhs, lhs._32 / rhs, lhs._33 / rhs, lhs._34 / rhs,
@@ -1218,30 +1218,30 @@ constexpr float3 normal_transform(const float3& normal, const float4x4& inverse_
 }
 
 constexpr float4x4 inverse(const float4x4& value) {
-    float _1 = value._33  * value._44;
-    float _2 = value._43  * value._34;
-    float _3 = value._23  * value._44;
-    float _4 = value._43  * value._24;
-    float _5 = value._23  * value._34;
-    float _6 = value._33  * value._24;
-    float _7 = value._13  * value._44;
-    float _8 = value._43  * value._14;
-    float _9 = value._13  * value._34;
-    float _10 = value._33 * value._14;
-    float _11 = value._13 * value._24;
-    float _12 = value._23 * value._14;
-    float _13 = value._31 * value._42;
-    float _14 = value._41 * value._32;
-    float _15 = value._21 * value._42;
-    float _16 = value._41 * value._22;
-    float _17 = value._21 * value._32;
-    float _18 = value._31 * value._22;
-    float _19 = value._11 * value._42;
-    float _20 = value._41 * value._12;
-    float _21 = value._11 * value._32;
-    float _22 = value._31 * value._12;
-    float _23 = value._11 * value._22;
-    float _24 = value._21 * value._12;
+    double _1 = value._33  * value._44;
+    double _2 = value._43  * value._34;
+    double _3 = value._23  * value._44;
+    double _4 = value._43  * value._24;
+    double _5 = value._23  * value._34;
+    double _6 = value._33  * value._24;
+    double _7 = value._13  * value._44;
+    double _8 = value._43  * value._14;
+    double _9 = value._13  * value._34;
+    double _10 = value._33 * value._14;
+    double _11 = value._13 * value._24;
+    double _12 = value._23 * value._14;
+    double _13 = value._31 * value._42;
+    double _14 = value._41 * value._32;
+    double _15 = value._21 * value._42;
+    double _16 = value._41 * value._22;
+    double _17 = value._21 * value._32;
+    double _18 = value._31 * value._22;
+    double _19 = value._11 * value._42;
+    double _20 = value._41 * value._12;
+    double _21 = value._11 * value._32;
+    double _22 = value._31 * value._12;
+    double _23 = value._11 * value._22;
+    double _24 = value._21 * value._12;
 
     float4x4 result(
         (_1  * value._22 + _4  * value._32 + _5  * value._42) - (_2  * value._22 + _3  * value._32 + _6  * value._42),
@@ -1262,12 +1262,12 @@ constexpr float4x4 inverse(const float4x4& value) {
         (_23 * value._33 + _17 * value._13 + _22 * value._23) - (_21 * value._23 + _24 * value._33 + _18 * value._13)
     );
 
-    float det = value._11 * result._11 + value._21 * result._12 + value._31 * result._13 + value._41 * result._14;
-    if (equal(det, 0.f)) {
+    double det = value._11 * result._11 + value._21 * result._12 + value._31 * result._13 + value._41 * result._14;
+    if (equal(det, 0.0)) {
         return float4x4();
     }
 
-    float multiplier = 1.f / det;
+    double multiplier = 1.0 / det;
     result._11 *= multiplier;
     result._12 *= multiplier;
     result._13 *= multiplier;
@@ -1288,7 +1288,7 @@ constexpr float4x4 inverse(const float4x4& value) {
     return result;
 }
 
-constexpr bool equal(const float4x4& lhs, const float4x4& rhs, float epsilon = EPSILON) {
+constexpr bool equal(const float4x4& lhs, const float4x4& rhs, double epsilon = EPSILON) {
     return equal(lhs._11, rhs._11, epsilon) &&
            equal(lhs._12, rhs._12, epsilon) &&
            equal(lhs._13, rhs._13, epsilon) &&
@@ -1318,16 +1318,16 @@ float3 sample_hemisphere(const float2& random);
 
 constexpr float3 to_rgb(const float3& xyz) {
     return float3(
-         3.240479f * xyz.x - 1.537150f * xyz.y - 0.498535f * xyz.z,
-        -0.969256f * xyz.x + 1.875991f * xyz.y + 0.041556f * xyz.z,
-         0.055648f * xyz.x - 0.204043f * xyz.y + 1.057311f * xyz.z
+         3.240479 * xyz.x - 1.537150 * xyz.y - 0.498535 * xyz.z,
+        -0.969256 * xyz.x + 1.875991 * xyz.y + 0.041556 * xyz.z,
+         0.055648 * xyz.x - 0.204043 * xyz.y + 1.057311 * xyz.z
     );
 }
 
 constexpr float3 to_xyz(const float3& rgb) {
     return float3(
-        0.412453f * rgb.r + 0.357580f * rgb.g + 0.180423f * rgb.b,
-        0.212671f * rgb.r + 0.715160f * rgb.g + 0.072169f * rgb.b,
-        0.019334f * rgb.r + 0.119193f * rgb.g + 0.950227f * rgb.b
+        0.412453 * rgb.r + 0.357580 * rgb.g + 0.180423 * rgb.b,
+        0.212671 * rgb.r + 0.715160 * rgb.g + 0.072169 * rgb.b,
+        0.019334 * rgb.r + 0.119193 * rgb.g + 0.950227 * rgb.b
     );
 }
