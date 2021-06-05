@@ -2,13 +2,11 @@
 
 #include "maths.h"
 
-constexpr float RANDOM_MAX = 0.99999994f;
-
 class Random {
 public:
     Random(unsigned int seed);
 
-    float rand();
+    double rand();
     float2 rand2();
     float3 rand3();
 

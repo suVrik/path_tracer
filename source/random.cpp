@@ -9,7 +9,7 @@ Random::Random(unsigned int seed) {
     }
 }
 
-float Random::rand() {
+double Random::rand() {
     unsigned int result;
 
     unsigned int mag01[2] = { 0x0U, MATRIX_A };
@@ -40,7 +40,7 @@ float Random::rand() {
     result ^= (result << 15) & 0xEFC60000U;
     result ^= (result >> 18);
 
-    return std::min(result * 2.3283064365386963e-10f, RANDOM_MAX);
+    return result / 4294967296.0;
 }
 
 float2 Random::rand2() {
