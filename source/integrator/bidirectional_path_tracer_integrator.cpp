@@ -25,7 +25,7 @@ BidirectionalPathTracerIntegrator::BidirectionalPathTracerIntegrator(int width, 
     assert(m_max_specular_bounces >= 0);
 
     for (Primitive& primitive : m_primitives) {
-        if (!equal(primitive.material_emissive(), 0.f)) {
+        if (!equal(primitive.material_emissive(), 0.0)) {
             m_area_lights.push_back(&primitive);
         }
     }
@@ -64,7 +64,7 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
     int tiles_count = end_tile_index - begin_tile_index;
 
-    float4x4 projection = float4x4::perspective(radians(30.f), static_cast<float>(m_film.width) / m_film.height, 1.f, 10.f);
+    float4x4 projection = float4x4::perspective(radians(30.0), static_cast<double>(m_film.width) / m_film.height, 1.0, 10.0);
     float4x4 inv_projection = inverse(projection);
 
     std::vector<Bounce> camera_bounces;
@@ -87,17 +87,17 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
         for (int y = 0; y < tile_height; y++) {
             for (int x = 0; x < tile_width; x++) {
-                float screen_x = x_from + x + random.rand();
-                float screen_y = y_from + y + random.rand();
+                double screen_x = x_from + x + random.rand();
+                double screen_y = y_from + y + random.rand();
 
                 if (!m_primitives.empty()) {
-                    float normalized_x = screen_x * 2.f / m_film.width - 1.f;
-                    float normalized_y = 1.f - screen_y * 2.f / m_film.height;
+                    double normalized_x = screen_x * 2.0 / m_film.width - 1.0;
+                    double normalized_y = 1.0 - screen_y * 2.0 / m_film.height;
 
                     float3 origin;
-                    float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.f), inv_projection));
+                    float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.0), inv_projection));
 
-                    float3 beta(1.f);
+                    float3 beta(1.0);
 
                     camera_bounces.clear();
 
@@ -122,7 +122,7 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
                         float3 ingoing_tangent_space;
                         float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random.rand2());
-                        if (equal(bsdf, 0.f) || equal(ingoing_tangent_space.z, 0.f)) {
+                        if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
                             break;
                         }
 
@@ -156,15 +156,15 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
                     float3 outgoing_tangent_space = sample_hemisphere(random.rand2());
                     float3 outgoing = normalize(outgoing_tangent_space * inverse_tangent_space);
 
-                    float pdf_light_index = 1.f / m_area_lights.size();
-                    float pdf_light_sample = 1.f / light->geometry_area();
-                    float pdf_light_outgoing = 1.f / (2.f * PI);
-                    float pdf_light = pdf_light_index * pdf_light_sample * pdf_light_outgoing;
+                    double pdf_light_index = 1.0 / m_area_lights.size();
+                    double pdf_light_sample = 1.0 / light->geometry_area();
+                    double pdf_light_outgoing = 1.0 / (2.0 * PI);
+                    double pdf_light = pdf_light_index * pdf_light_sample * pdf_light_outgoing;
 
                     float3 beta = light->material_emissive() * std::abs(outgoing_tangent_space.z) / pdf_light;
 
                     light_bounces.clear();
-                    light_bounces.push_back(Bounce{ light, origin, tangent_space, inverse_tangent_space, float3(0.f, 0.f, 1.f), float3(1.f) });
+                    light_bounces.push_back(Bounce{ light, origin, tangent_space, inverse_tangent_space, float3(0.0, 0.0, 1.0), float3(1.0) });
 
                     int diffuse_bounces = 0;
                     int specular_bounces = 0;
@@ -187,7 +187,7 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
                         float3 ingoing_tangent_space;
                         float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random.rand2());
-                        if (equal(bsdf, 0.f) || equal(ingoing_tangent_space.z, 0.f)) {
+                        if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
                             break;
                         }
 
@@ -211,12 +211,12 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
                     for (const Bounce& light_bounce : light_bounces) {
                         float3 ingoing = light_bounce.position - camera_bouce.position;
-                        float ingoing_length = length(ingoing);
+                        double ingoing_length = length(ingoing);
                         ingoing /= ingoing_length;
 
-                        if (!equal(ingoing_length, 0.f)) {
-                            float3 camera_bounce_normal = normalize(float3(0.f, 0.f, 1.f) * camera_bouce.inv_tangent_space);
-                            float3 light_bounce_normal = normalize(float3(0.f, 0.f, 1.f) * light_bounce.inv_tangent_space);
+                        if (!equal(ingoing_length, 0.0)) {
+                            float3 camera_bounce_normal = normalize(float3(0.0, 0.0, 1.0) * camera_bouce.inv_tangent_space);
+                            float3 light_bounce_normal = normalize(float3(0.0, 0.0, 1.0) * light_bounce.inv_tangent_space);
 
                             if (dot(camera_bounce_normal, ingoing) > EPSILON && dot(light_bounce_normal, -ingoing) > EPSILON) {
                                 std::optional<PrimitiveHit> hit = raycast(camera_bouce.position, ingoing);
@@ -227,7 +227,7 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
                                     float3 ingoing_light_bounce_tangent_space = normalize((-ingoing) * light_bounce.tangent_space);
                                     float3 light_bounce_bsdf = light_bounce.primitive->material_bsdf(light_bounce.outgoing_tangent_space, ingoing_light_bounce_tangent_space);
 
-                                    float G = std::abs(ingoing_camera_bounce_tangent_space.z) * std::abs(light_bounce.outgoing_tangent_space.z) / sqr(ingoing_length);
+                                    double G = std::abs(ingoing_camera_bounce_tangent_space.z) * std::abs(light_bounce.outgoing_tangent_space.z) / sqr(ingoing_length);
                                     radiance += camera_bouce.beta * camera_bounce_bsdf * (light_bounce_bsdf * light_bounce.beta + light_bounce.primitive->material_emissive()) * G;
                                 }
                             }
@@ -243,7 +243,7 @@ void BidirectionalPathTracerIntegrator::integrate(int thread_index) {
 
 std::optional<BidirectionalPathTracerIntegrator::PrimitiveHit> BidirectionalPathTracerIntegrator::raycast(const float3& origin, const float3& direction) const {
     std::optional<PrimitiveHit> result;
-    float length = std::numeric_limits<float>::infinity();
+    double length = std::numeric_limits<double>::infinity();
 
     for (const Primitive& primitive : m_primitives) {
         std::optional<GeometryHit> hit = primitive.geometry_raycast(origin, direction, length);

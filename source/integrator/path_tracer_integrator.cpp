@@ -47,7 +47,7 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
     int tiles_count = end_tile_index - begin_tile_index;
 
-    float4x4 projection = float4x4::perspective(radians(30.f), static_cast<float>(m_film.width) / m_film.height, 1.f, 10.f);
+    float4x4 projection = float4x4::perspective(radians(30.0), static_cast<double>(m_film.width) / m_film.height, 1.0, 10.0);
     float4x4 inv_projection = inverse(projection);
 
     while (tiles_count > 0 && current_tile_index / tiles_count < m_samples_per_pixel) {
@@ -64,17 +64,17 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
         for (int y = 0; y < tile_height; y++) {
             for (int x = 0; x < tile_width; x++) {
-                float screen_x = x_from + x + random.rand();
-                float screen_y = y_from + y + random.rand();
+                double screen_x = x_from + x + random.rand();
+                double screen_y = y_from + y + random.rand();
                 
-                float normalized_x = screen_x * 2.f / m_film.width - 1.f;
-                float normalized_y = 1.f - screen_y * 2.f / m_film.height;
+                double normalized_x = screen_x * 2.0 / m_film.width - 1.0;
+                double normalized_y = 1.0 - screen_y * 2.0 / m_film.height;
 
-                float3 origin(0.f);
-                float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.f), inv_projection));
+                float3 origin(0.0);
+                float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.0), inv_projection));
 
-                float3 beta(1.f);
-                float3 radiance(0.f);
+                float3 beta(1.0);
+                float3 radiance(0.0);
 
                 int diffuse_bounces = 0;
                 int specular_bounces = 0;
@@ -94,7 +94,7 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
                     float3 ingoing_tangent_space;
                     float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random.rand2());
-                    if (equal(bsdf, 0.f) || equal(ingoing_tangent_space.z, 0.f)) {
+                    if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
                         break;
                     }
 
@@ -102,7 +102,7 @@ void PathTracerIntegrator::integrate(int thread_index) {
                     outgoing = normalize(ingoing_tangent_space * inverse_tangent_space);
 
                     beta *= bsdf * std::abs(ingoing_tangent_space.z) * 2;
-                    if (equal(beta, 0.f)) {
+                    if (equal(beta, 0.0)) {
                         break;
                     }
 
@@ -121,7 +121,7 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
 std::optional<PathTracerIntegrator::PrimitiveHit> PathTracerIntegrator::raycast(const float3& origin, const float3& direction) const {
     std::optional<PrimitiveHit> result;
-    float length = std::numeric_limits<float>::infinity();
+    double length = std::numeric_limits<double>::infinity();
 
     for (const Primitive& primitive : m_primitives) {
         std::optional<GeometryHit> hit = primitive.geometry_raycast(origin, direction, length);
