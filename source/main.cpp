@@ -13,82 +13,82 @@
 
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
-constexpr int TEXTURE_WIDTH = 800;
-constexpr int TEXTURE_HEIGHT = 600;
-constexpr int SAMPLES_PER_PIXEL = 512;
+constexpr int TEXTURE_WIDTH = 400;
+constexpr int TEXTURE_HEIGHT = 300;
+constexpr int SAMPLES_PER_PIXEL = 16384;
 constexpr int DIFFUSE_BOUNCES_MAX = 4;
 constexpr int SPECULAR_BOUNCES_MAX = 4;
 
 static std::vector<Primitive> build_scene() {
-    auto long_wall_geometry = std::make_shared<BoxGeometry>(float3(0.5f, 0.5f, 1.5f));
+    auto long_wall_geometry = std::make_shared<BoxGeometry>(float3(0.5, 0.5, 1.5));
     assert(long_wall_geometry != nullptr);
     
-    auto short_wall_geometry = std::make_shared<BoxGeometry>(float3(0.5f));
+    auto short_wall_geometry = std::make_shared<BoxGeometry>(float3(0.5));
     assert(short_wall_geometry != nullptr);
 
-    auto top_side_geometry = std::make_shared<BoxGeometry>(float3(0.2f, 0.5f, 1.5f));
+    auto top_side_geometry = std::make_shared<BoxGeometry>(float3(0.2, 0.5, 1.5));
     assert(top_side_geometry != nullptr);
 
-    auto top_front_geometry = std::make_shared<BoxGeometry>(float3(0.1f, 0.5f, 0.2f));
+    auto top_front_geometry = std::make_shared<BoxGeometry>(float3(0.1, 0.5, 0.2));
     assert(top_front_geometry != nullptr);
 
-    auto top_back_geometry = std::make_shared<BoxGeometry>(float3(0.1f, 0.5f, 1.2f));
+    auto top_back_geometry = std::make_shared<BoxGeometry>(float3(0.1, 0.5, 1.2));
     assert(top_back_geometry != nullptr);
     
-    auto lamp_geometry = std::make_shared<BoxGeometry>(float3(0.1f));
+    auto lamp_geometry = std::make_shared<BoxGeometry>(float3(0.1));
     assert(lamp_geometry != nullptr);
 
-    auto left_box_geometry = std::make_shared<BoxGeometry>(float3(0.15f, 0.275f, 0.15f));
+    auto left_box_geometry = std::make_shared<BoxGeometry>(float3(0.15, 0.275, 0.15));
     assert(left_box_geometry != nullptr);
 
-    auto right_box_geometry = std::make_shared<BoxGeometry>(float3(0.15f));
+    auto right_box_geometry = std::make_shared<BoxGeometry>(float3(0.15));
     assert(right_box_geometry != nullptr);
 
-    auto sphere_geometry = std::make_shared<SphereGeometry>(0.15f);
+    auto sphere_geometry = std::make_shared<SphereGeometry>(0.15);
     assert(sphere_geometry != nullptr);
 
-    auto red_material = std::make_shared<DiffuseMaterial>(float3(1.f, 0.f, 0.f));
+    auto red_material = std::make_shared<DiffuseMaterial>(float3(1.0, 0.0, 0.0));
     assert(red_material != nullptr);
     
-    auto green_material = std::make_shared<DiffuseMaterial>(float3(0.f, 1.f, 0.f));
+    auto green_material = std::make_shared<DiffuseMaterial>(float3(0.0, 1.0, 0.0));
     assert(green_material != nullptr);
     
-    auto white_material = std::make_shared<DiffuseMaterial>(float3(1.f));
+    auto white_material = std::make_shared<DiffuseMaterial>(float3(1.0));
     assert(white_material != nullptr);
 
-    auto emissive_material = std::make_shared<EmissiveMaterial>(float3(3.f));
+    auto emissive_material = std::make_shared<EmissiveMaterial>(float3(3.0));
     assert(emissive_material != nullptr);
 
-    auto reflective_material = std::make_shared<SpecularReflectiveMaterial>(10.f);
+    auto reflective_material = std::make_shared<SpecularReflectiveMaterial>(10.0);
     assert(reflective_material != nullptr);
 
-    auto transmissive_material = std::make_shared<SpecularTransmissiveMaterial>(2.5f);
+    auto transmissive_material = std::make_shared<SpecularTransmissiveMaterial>(2.5);
     assert(transmissive_material != nullptr);
 
-    float4x4 left_box_transform = float4x4::rotation(float3(0.f, 1.f, 0.f), radians(-20.f)) * float4x4::translation(float3(-0.175f, -0.225f, 2.5f));
-    float4x4 right_box_transform = float4x4::rotation(float3(0.f, 1.f, 0.f), radians(20.f)) * float4x4::translation(float3(0.175f, -0.35f, 2.3f));
+    float4x4 left_box_transform = float4x4::rotation(float3(0.0, 1.0, 0.0), radians(-20.0)) * float4x4::translation(float3(-0.175, -0.225, 2.5));
+    float4x4 right_box_transform = float4x4::rotation(float3(0.0, 1.0, 0.0), radians(20.0)) * float4x4::translation(float3(0.175, -0.35, 2.3));
 
     return std::vector<Primitive> {
-        { long_wall_geometry,  red_material,   float4x4::translation(float3(-1.f, 0.f, 1.4f))  }, // left wall
-        { long_wall_geometry,  green_material, float4x4::translation(float3(1.f, 0.f, 1.4f))   }, // right wall
-        { long_wall_geometry,  white_material, float4x4::translation(float3(0.f, -1.f, 1.4f))  }, // bottom wall
-        { short_wall_geometry, white_material, float4x4::translation(float3(0.f, 0.f, 3.4f))   }, // front wall
-        { short_wall_geometry, white_material, float4x4::translation(float3(0.f, 0.f, -0.6f))  }, // back wall
-        { top_side_geometry,   white_material, float4x4::translation(float3(-0.3f, 1.f, 1.4f)) }, // top left wall
-        { top_side_geometry,   white_material, float4x4::translation(float3(0.3f, 1.f, 1.4f))  }, // top right wall
-        { top_front_geometry,  white_material, float4x4::translation(float3(0.f, 1.f, 2.7f))   }, // top front wall
-        { top_back_geometry,   white_material, float4x4::translation(float3(0.f, 1.f, 1.1f))   }, // top back wall
+        { long_wall_geometry,  red_material,   float4x4::translation(float3(-1.0, 0.0, 1.4))  }, // left wall
+        { long_wall_geometry,  green_material, float4x4::translation(float3(1.0, 0.0, 1.4))   }, // right wall
+        { long_wall_geometry,  white_material, float4x4::translation(float3(0.0, -1.0, 1.4))  }, // bottom wall
+        { short_wall_geometry, white_material, float4x4::translation(float3(0.0, 0.0, 3.4))   }, // front wall
+        { short_wall_geometry, white_material, float4x4::translation(float3(0.0, 0.0, -0.6))  }, // back wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(-0.3, 1.0, 1.4)) }, // top left wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(0.3, 1.0, 1.4))  }, // top right wall
+        { top_front_geometry,  white_material, float4x4::translation(float3(0.0, 1.0, 2.7))   }, // top front wall
+        { top_back_geometry,   white_material, float4x4::translation(float3(0.0, 1.0, 1.1))   }, // top back wall
 
         { left_box_geometry,  white_material, left_box_transform  }, // left box
         { right_box_geometry, white_material, right_box_transform }, // right box
 
-        //{ sphere_geometry, reflective_material, float4x4::translation(float3(-0.175f, -0.35f, 2.5f)) }, // left sphere
-        //{ sphere_geometry, reflective_material, float4x4::translation(float3(0.175f, -0.35f, 2.3f)) }, // right sphere
+        //{ sphere_geometry, reflective_material, float4x4::translation(float3(-0.175, -0.35, 2.5)) }, // left sphere
+        //{ sphere_geometry, reflective_material, float4x4::translation(float3(0.175, -0.35, 2.3)) }, // right sphere
 
-        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(-0.175f, -0.35f, 2.5f)) }, // left sphere
-        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(0.175f, -0.35f, 2.3f)) }, // right sphere
+        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(-0.175, -0.35, 2.5)) }, // left sphere
+        //{ sphere_geometry, transmissive_material, float4x4::translation(float3(0.175, -0.35, 2.3)) }, // right sphere
 
-        { lamp_geometry, emissive_material, float4x4::translation(float3(0.f, 0.61f, 2.4f)) }, // lamp
+        { lamp_geometry, emissive_material, float4x4::translation(float3(0.0, 0.61, 2.4)) }, // lamp
     };
 }
 
