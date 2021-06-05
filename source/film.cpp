@@ -3,16 +3,16 @@
 #include <cassert>
 #include <mutex>
 
-static float gamma_correct(float value) {
-    if (value <= 0.0031308f) {
-        return 12.92f * value;
+static double gamma_correct(double value) {
+    if (value <= 0.0031308) {
+        return 12.92 * value;
     }
 
-    return 1.055f * std::pow(value, 1.f / 2.4f) - 0.055f;
+    return 1.055 * std::pow(value, 1.0 / 2.4) - 0.055;
 }
 
-static float convert(float value) {
-    return static_cast<char>(clamp(gamma_correct(value), 0.f, 1.f) * 255.f + 0.5f);
+static double convert(double value) {
+    return static_cast<char>(clamp(gamma_correct(value), 0.0, 1.0) * 255.0 + 0.5);
 }
 
 Film::Film(int width, int height)
@@ -43,7 +43,7 @@ void Film::blit(void* rgba, int pitch) {
             for (int y = 0; y < tile_height; y++) {
                 for (int x = 0; x < tile_width; x++) {
                     float3 spectrum;
-                    if (tile.pixels[y][x].divider != 0.f) {
+                    if (tile.pixels[y][x].divider != 0.0) {
                         spectrum = tile.pixels[y][x].samples / tile.pixels[y][x].divider;
                     }
 
@@ -59,9 +59,9 @@ void Film::blit(void* rgba, int pitch) {
     }
 }
 
-void Film::add_sample(float x, float y, const float3& sample) {
+void Film::add_sample(double x, double y, const float3& sample) {
     assert(isfinite(sample));
-    assert(sample.x >= 0.f && sample.y >= 0.f && sample.z >= 0.f);
+    assert(sample.x >= 0.0 && sample.y >= 0.0 && sample.z >= 0.0);
 
     int screen_x = static_cast<int>(x);
     int screen_y = static_cast<int>(y);
@@ -77,6 +77,6 @@ void Film::add_sample(float x, float y, const float3& sample) {
         Pixel& pixel = tile.pixels[pixel_y][pixel_x];
 
         pixel.samples += sample;
-        pixel.divider += 1.f;
+        pixel.divider += 1.0;
     }
 }

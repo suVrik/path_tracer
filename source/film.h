@@ -12,7 +12,7 @@ public:
 
     void blit(void* rgba, int pitch);
 
-    void add_sample(float x, float y, const float3& sample);
+    void add_sample(double x, double y, const float3& sample);
 
     const int width;
     const int height;
@@ -23,7 +23,7 @@ public:
 private:
     struct Pixel {
         float3 samples;
-        float divider = 0.f;
+        double divider = 0.0;
     };
 
     struct Tile {
