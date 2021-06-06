@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <numeric>
+#include <random>
 
 PathTracerIntegrator::PathTracerIntegrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives)
     : m_film(width, height)
@@ -10,10 +12,14 @@ PathTracerIntegrator::PathTracerIntegrator(int width, int height, int samples_pe
     , m_max_diffuse_bounces(max_diffuse_bounces)
     , m_max_specular_bounces(max_specular_bounces)
     , m_primitives(std::move(primitives))
+    , m_shuffled_samples(samples_per_pixel)
 {
     assert(m_samples_per_pixel > 0);
     assert(m_max_diffuse_bounces > 0);
     assert(m_max_specular_bounces >= 0);
+
+    std::iota(m_shuffled_samples.begin(), m_shuffled_samples.end(), 0);
+    std::shuffle(m_shuffled_samples.begin(), m_shuffled_samples.end(), std::default_random_engine());
 
     m_thread_count = std::clamp(static_cast<int>(std::thread::hardware_concurrency()), 1, m_film.tiles_x * m_film.tiles_y);
 
@@ -36,7 +42,7 @@ void PathTracerIntegrator::blit(void* rgba, int pitch) {
 void PathTracerIntegrator::integrate(int thread_index) {
     assert(thread_index >= 0 && thread_index < m_thread_count);
 
-    Random random(thread_index);
+    Random random(thread_index, m_samples_per_pixel);
 
     int tiles_total = m_film.tiles_x * m_film.tiles_y;
     int tiles_per_thread = tiles_total / m_thread_count;
@@ -66,8 +72,13 @@ void PathTracerIntegrator::integrate(int thread_index) {
         int tile_width = std::min(x_from + TILE_SIZE, m_film.width) - x_from;
         int tile_height = std::min(y_from + TILE_SIZE, m_film.height) - y_from;
 
+        float3 samples[TILE_SIZE][TILE_SIZE];
+
         for (int y = 0; y < tile_height; y++) {
             for (int x = 0; x < tile_width; x++) {
+                // Hide stratified sampling effect. Make it look uniform.
+                int shuffled_sample = m_shuffled_samples[(sample_index + (x_from * 23ll + y_from * 37ll) * (x * 43ll + y * 47ll)) % m_samples_per_pixel];
+
                 float2 offset = random.rand2();
 
                 double screen_x = x_from + x + offset.x;
@@ -80,7 +91,6 @@ void PathTracerIntegrator::integrate(int thread_index) {
                 float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.0), inv_projection));
 
                 float3 beta(1.0);
-                float3 radiance(0.0);
 
                 int diffuse_bounces = 0;
                 int specular_bounces = 0;
@@ -91,22 +101,22 @@ void PathTracerIntegrator::integrate(int thread_index) {
                         break;
                     }
 
-                    radiance += beta * hit->primitive->material_emissive();
+                    samples[y][x] += beta * hit->primitive->material_emissive();
 
                     float3x3 tangent_space = transpose(float3x3(hit->tangent, hit->bitangent, hit->normal));
                     float3x3 inverse_tangent_space = inverse(tangent_space);
                         
                     float3 outgoing_tangent_space = normalize((-outgoing) * tangent_space);
 
-                    float2 u;
+                    float2 random_value;
                     if (diffuse_bounces == 0) {
-                        u = random.rand2(sample_index, m_samples_per_pixel);
+                        random_value = random.rand2(shuffled_sample);
                     } else {
-                        u = random.rand2();
+                        random_value = random.rand2();
                     }
 
                     float3 ingoing_tangent_space;
-                    float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, u);
+                    float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random_value);
                     if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
                         break;
                     }
@@ -125,10 +135,10 @@ void PathTracerIntegrator::integrate(int thread_index) {
                         diffuse_bounces++;
                     }
                 }
-
-                m_film.add_sample(screen_x, screen_y, radiance);
             }
         }
+
+        m_film.add_samples(tile_x, tile_y, samples);
     }
 }
 

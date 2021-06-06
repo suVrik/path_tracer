@@ -30,6 +30,8 @@ private:
     int m_max_specular_bounces;
     std::vector<Primitive> m_primitives;
 
+    std::vector<int> m_shuffled_samples;
+
     int m_thread_count;
     std::vector<std::thread> m_threads;
 };

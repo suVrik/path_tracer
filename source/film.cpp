@@ -60,7 +60,7 @@ void Film::blit(void* rgba, int pitch) {
 }
 
 void Film::add_samples(int tile_x, int tile_y, float3 samples[TILE_SIZE][TILE_SIZE]) {
-    assert(tile_x >= 0 && tile_x < tile_x && tile_y >= 0 && tile_y < tiles_y);
+    assert(tile_x >= 0 && tile_x < tiles_x && tile_y >= 0 && tile_y < tiles_y);
 
     Tile& tile = m_tiles[static_cast<size_t>(tile_y) * tiles_x + tile_x];
     tile.divider += 1.0;
