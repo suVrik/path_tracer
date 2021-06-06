@@ -43,8 +43,8 @@ void Film::blit(void* rgba, int pitch) {
             for (int y = 0; y < tile_height; y++) {
                 for (int x = 0; x < tile_width; x++) {
                     float3 spectrum;
-                    if (tile.pixels[y][x].divider != 0.0) {
-                        spectrum = tile.pixels[y][x].samples / tile.pixels[y][x].divider;
+                    if (tile.divider != 0.0) {
+                        spectrum = tile.samples[y][x] / tile.divider;
                     }
 
                     int offset = (i * TILE_SIZE + y) * pitch + (j * TILE_SIZE + x) * 4;
@@ -59,24 +59,18 @@ void Film::blit(void* rgba, int pitch) {
     }
 }
 
-void Film::add_sample(double x, double y, const float3& sample) {
-    assert(isfinite(sample));
-    assert(sample.x >= 0.0 && sample.y >= 0.0 && sample.z >= 0.0);
+void Film::add_samples(int tile_x, int tile_y, float3 samples[TILE_SIZE][TILE_SIZE]) {
+    assert(tile_x >= 0 && tile_x < tile_x && tile_y >= 0 && tile_y < tiles_y);
 
-    int screen_x = static_cast<int>(x);
-    int screen_y = static_cast<int>(y);
+    Tile& tile = m_tiles[static_cast<size_t>(tile_y) * tiles_x + tile_x];
+    tile.divider += 1.0;
 
-    if (screen_x >= 0 && screen_x < width && screen_y >= 0 && screen_y < height) {
-        int tile_x = screen_x / TILE_SIZE;
-        int tile_y = screen_y / TILE_SIZE;
+    for (int y = 0; y < TILE_SIZE; y++) {
+        for (int x = 0; x < TILE_SIZE; x++) {
+            assert(isfinite(samples[y][x]));
+            assert(samples[y][x].r >= 0.0 && samples[y][x].g >= 0.0 && samples[y][x].b >= 0.0);
 
-        int pixel_x = screen_x - tile_x * TILE_SIZE;
-        int pixel_y = screen_y - tile_y * TILE_SIZE;
-
-        Tile& tile = m_tiles[static_cast<size_t>(tile_y) * tiles_x + tile_x];
-        Pixel& pixel = tile.pixels[pixel_y][pixel_x];
-
-        pixel.samples += sample;
-        pixel.divider += 1.0;
+            tile.samples[y][x] += samples[y][x];
+        }
     }
 }
