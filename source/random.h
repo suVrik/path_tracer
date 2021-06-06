@@ -2,26 +2,26 @@
 
 #include "maths.h"
 
+#include <random>
+#include <vector>
+
 class Random {
 public:
-    Random(unsigned int seed);
+    Random(int seed, int total_samples);
 
     double rand();
     float2 rand2();
-    float3 rand3();
 
-    double rand(int sample, int total_samples);
-    float2 rand2(int sample, int total_samples);
-    float3 rand3(int sample, int total_samples);
+    double rand(int sample);
+    float2 rand2(int sample);
 
 private:
-    static constexpr int N = 624;
-    static constexpr int M = 397;
+    std::mt19937 m_generator;
+    std::uniform_real_distribution<double> m_distribution;
 
-    static constexpr unsigned int MATRIX_A   = 0x9908B0DFU;
-    static constexpr unsigned int UPPER_MASK = 0x80000000U;
-    static constexpr unsigned int LOWER_MASK = 0x7FFFFFFFU;
+    int m_sample_count_1d;
+    int m_sample_count_2d;
 
-    unsigned int m_vector[N];
-    unsigned int m_index;
+    std::vector<int> m_sample_mapping_1d;
+    std::vector<int> m_sample_mapping_2d;
 };

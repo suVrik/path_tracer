@@ -1,72 +1,46 @@
 #include "random.h"
 
 #include <algorithm>
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <numeric>
+#include <random>
 
-Random::Random(unsigned int seed) {
-    m_vector[0] = seed;
-    for (m_index = 1; m_index < N; m_index++) {
-        m_vector[m_index] = (1812433253U * (m_vector[m_index - 1] ^ (m_vector[m_index - 1] >> 30)) + m_index);
-    }
+Random::Random(int seed, int total_samples)
+    : m_generator(seed)
+    , m_distribution(0.0, 1.0)
+    , m_sample_count_1d(total_samples)
+    , m_sample_count_2d(static_cast<int>(std::sqrt(total_samples)))
+    , m_sample_mapping_1d(m_sample_count_1d)
+    , m_sample_mapping_2d(m_sample_count_2d)
+{
+    std::iota(m_sample_mapping_1d.begin(), m_sample_mapping_1d.end(), 0);
+    std::iota(m_sample_mapping_2d.begin(), m_sample_mapping_2d.end(), 0);
+
+    std::shuffle(m_sample_mapping_1d.begin(), m_sample_mapping_1d.end(), std::default_random_engine(static_cast<unsigned int>(seed)));
+    std::shuffle(m_sample_mapping_2d.begin(), m_sample_mapping_2d.end(), std::default_random_engine(static_cast<unsigned int>(seed)));
 }
 
 double Random::rand() {
-    unsigned int result;
-
-    unsigned int mag01[2] = { 0x0U, MATRIX_A };
-
-    if (m_index >= N) {
-        int i;
-
-        for (i = 0; i < N - M; i++) {
-            result = (m_vector[i] & UPPER_MASK) | (m_vector[i + 1] & LOWER_MASK);
-            m_vector[i] = m_vector[i + M] ^ (result >> 1) ^ mag01[result & 0x1U];
-        }
-
-        for (; i < N - 1; i++) {
-            result = (m_vector[i] & UPPER_MASK) | (m_vector[i + 1] & LOWER_MASK);
-            m_vector[i] = m_vector[i + (M - N)] ^ (result >> 1) ^ mag01[result & 0x1U];
-        }
-        
-        result = (m_vector[N - 1] & UPPER_MASK) | (m_vector[0] & LOWER_MASK);
-        m_vector[N - 1] = m_vector[M - 1] ^ (result >> 1) ^ mag01[result & 0x1U];
-
-        m_index = 0;
-    }
-
-    result = m_vector[m_index++];
-
-    result ^= (result >> 11);
-    result ^= (result << 7) & 0x9D2C5680U;
-    result ^= (result << 15) & 0xEFC60000U;
-    result ^= (result >> 18);
-
-    return result / 4294967296.0;
+    return m_distribution(m_generator);
 }
 
 float2 Random::rand2() {
     return float2(rand(), rand());
 }
 
-float3 Random::rand3() {
-    return float3(rand(), rand(), rand());
+double Random::rand(int sample) {
+    if (sample < m_sample_count_1d) {
+        return (m_sample_mapping_1d[sample] + rand()) / m_sample_count_1d;
+    }
+    return rand();
 }
 
-double Random::rand(int sample, int total_samples) {
-    return (sample + rand()) / total_samples;
-}
-
-float2 Random::rand2(int sample, int total_samples) {
-    int axis = static_cast<int>(std::sqrt(total_samples));
-    if (sample < axis * axis) {
-        return float2(rand(sample % axis, axis), rand(sample / axis, axis));
+float2 Random::rand2(int sample) {
+    if (sample < m_sample_count_2d * m_sample_count_2d) {
+        return float2((m_sample_mapping_2d[sample % m_sample_count_2d] + rand()) / m_sample_count_2d,
+                      (m_sample_mapping_2d[sample / m_sample_count_2d] + rand()) / m_sample_count_2d);
     }
     return rand2();
-}
-
-float3 Random::rand3(int sample, int total_samples) {
-    int axis = static_cast<int>(std::pow(total_samples, 1.0 / 3.0));
-    if (sample < axis * axis * axis) {
-        return float3(rand(sample % axis, axis), rand(sample / axis % axis, axis), rand(sample / axis / axis, axis));
-    }
-    return rand3();
 }
