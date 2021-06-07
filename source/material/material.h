@@ -10,9 +10,9 @@ class Material {
 public:
     virtual ~Material() = default;
 
-    virtual float3 bsdf(float3& ingoing, const float3& outgoing, const float2& random) const;
+    virtual float3 bsdf(float3& ingoing, const float3& outgoing, double& pdf, const float2& random) const;
 
-    virtual float3 bsdf(const float3& ingoing, const float3& outgoing) const;
+    virtual float3 bsdf(const float3& ingoing, const float3& outgoing, double& pdf) const;
 
     virtual float3 emissive() const;
 

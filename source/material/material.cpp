@@ -52,19 +52,22 @@ bool refract(const float3& incident, const float3& normal, double ior, float3& t
     return true;
 }
 
-float3 Material::bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
+float3 Material::bsdf(float3& ingoing, const float3& outgoing, double& pdf, const float2& random) const {
     assert(equal(length(outgoing), 1.0));
     assert(random[0] >= 0.0 && random[0] < 1.0);
     assert(random[1] >= 0.0 && random[1] < 1.0);
 
     ingoing = float3(-outgoing.x, -outgoing.y, outgoing.z);
+    pdf = 0.0;
 
     return float3();
 }
 
-float3 Material::bsdf(const float3& ingoing, const float3& outgoing) const {
+float3 Material::bsdf(const float3& ingoing, const float3& outgoing, double& pdf) const {
     assert(equal(length(ingoing), 1.0));
-    assert(equal(length(outgoing), 1.0) && !equal(outgoing.z, 0.0));
+    assert(equal(length(outgoing), 1.0));
+
+    pdf = 0.0;
 
     return float3();
 }

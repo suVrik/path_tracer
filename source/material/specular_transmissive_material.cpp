@@ -8,7 +8,7 @@ SpecularTransmissiveMaterial::SpecularTransmissiveMaterial(double ior)
     assert(m_ior >= 1.0);
 }
 
-float3 SpecularTransmissiveMaterial::bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
+float3 SpecularTransmissiveMaterial::bsdf(float3& ingoing, const float3& outgoing, double& pdf, const float2& random) const {
     assert(equal(length(outgoing), 1.0) && !equal(outgoing.z, 0.0));
     assert(random[0] >= 0.0 && random[0] < 1.0);
     assert(random[1] >= 0.0 && random[1] < 1.0);
@@ -20,6 +20,8 @@ float3 SpecularTransmissiveMaterial::bsdf(float3& ingoing, const float3& outgoin
     if (!refract(outgoing, faceforward(float3(0.0, 0.0, 1.0), outgoing), incident_ior / transmitted_ior, ingoing)) {
         return float3(0.0);
     }
+
+    pdf = 1.0;
 
     return float3((1.0 - fresnel_dielectric(ingoing.z, transmitted_ior, incident_ior)) / std::abs(ingoing.z));
 }

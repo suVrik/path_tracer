@@ -97,27 +97,29 @@ double Primitive::geometry_pdf(const float3& origin, const float3& direction) co
     return result;
 }
 
-float3 Primitive::material_bsdf(float3& ingoing, const float3& outgoing, const float2& random) const {
+float3 Primitive::material_bsdf(float3& ingoing, const float3& outgoing, double& pdf, const float2& random) const {
     assert(equal(length(outgoing), 1.0));
     assert(random[0] >= 0.0 && random[0] < 1.0);
     assert(random[1] >= 0.0 && random[1] < 1.0);
 
-    float3 result = m_material->bsdf(ingoing, outgoing, random);
+    float3 result = m_material->bsdf(ingoing, outgoing, pdf, random);
 
     assert(result.x >= 0.0 && result.y >= 0.0 && result.z >= 0.0);
     assert(equal(length(ingoing), 1.0));
+    assert(pdf >= 0.0);
 
     return result;
 }
 
-float3 Primitive::material_bsdf(const float3& ingoing, const float3& outgoing) const {
+float3 Primitive::material_bsdf(const float3& ingoing, const float3& outgoing, double& pdf) const {
     assert(equal(length(ingoing), 1.0));
     assert(equal(length(outgoing), 1.0));
 
-    float3 result = m_material->bsdf(ingoing, outgoing);
+    float3 result = m_material->bsdf(ingoing, outgoing, pdf);
 
     assert(isfinite(result));
     assert(result.x >= 0.0 && result.y >= 0.0 && result.z >= 0.0);
+    assert(pdf >= 0.0);
 
     return result;
 }
