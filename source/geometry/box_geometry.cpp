@@ -86,12 +86,12 @@ std::optional<GeometryHit> BoxGeometry::raycast(const float3& origin, const floa
 }
 
 static const GeometrySample BOX_SAMPLES[6] = {
-    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0)  },
-    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3(-1.0, 0.0, 0.0) },
-    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0)  },
-    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0) },
-    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0)  },
-    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, -1.0) },
+    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3( 1.0,  0.0,  0.0) },
+    { float3(), float3(0.0, 1.0, 0.0), float3(0.0, 0.0, 1.0), float3(-1.0,  0.0,  0.0) },
+    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3( 0.0,  1.0,  0.0) },
+    { float3(), float3(0.0, 0.0, 1.0), float3(1.0, 0.0, 0.0), float3( 0.0, -1.0,  0.0) },
+    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3( 0.0,  0.0,  1.0) },
+    { float3(), float3(1.0, 0.0, 0.0), float3(0.0, 1.0, 0.0), float3( 0.0,  0.0, -1.0) },
 };
 
 GeometrySample BoxGeometry::sample(const float2& random) const {
@@ -104,11 +104,22 @@ GeometrySample BoxGeometry::sample(const float2& random) const {
     double u = lerp(-1.0, 1.0, clamp(random[0] * 6.0 - side_index, 0.0, 1.0));
     double v = lerp(-1.0, 1.0, random[1]);
 
-    GeometrySample result = BOX_SAMPLES[side_index];
+    GeometrySample result = BOX_SAMPLES[3];
     result.position = m_half_extents * (result.normal + u * result.tangent + v * result.bitangent);
     return result;
 }
 
-double BoxGeometry::area() const {
-    return (m_half_extents.x * m_half_extents.y + m_half_extents.x * m_half_extents.z + m_half_extents.y * m_half_extents.z) * 2.0;
+double BoxGeometry::pdf(const float3& origin, const float3& direction) const {
+    assert(isfinite(origin));
+    assert(equal(::length(direction), 1.0));
+
+    std::optional<GeometryHit> hit = raycast(origin, direction, std::numeric_limits<double>::infinity());
+    if (hit) {
+        double distance_squared = square_distance(hit->position, origin);
+        double consine = std::abs(dot(hit->normal, direction));
+        double area = (m_half_extents.x * m_half_extents.y + m_half_extents.x * m_half_extents.z + m_half_extents.y * m_half_extents.z) * 2.0;
+        return distance_squared / (consine * area);
+    }
+
+    return 0.0;
 }

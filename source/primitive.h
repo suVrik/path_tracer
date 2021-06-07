@@ -11,7 +11,7 @@ public:
 
     std::optional<GeometryHit> geometry_raycast(const float3& origin, const float3& direction, double length) const;
     GeometrySample geometry_sample(const float2& random) const;
-    double geometry_area() const;
+    double geometry_pdf(const float3& origin, const float3& direction) const;
 
     float3 material_bsdf(float3& ingoing, const float3& outgoing, const float2& random) const;
     float3 material_bsdf(const float3& ingoing, const float3& outgoing) const;

@@ -79,8 +79,17 @@ GeometrySample Primitive::geometry_sample(const float2& random) const {
     return world_space_sample;
 }
 
-double Primitive::geometry_area() const {
-    double result = m_geometry->area();
+double Primitive::geometry_pdf(const float3& origin, const float3& direction) const {
+    assert(isfinite(origin));
+    assert(equal(::length(direction), 1.0));
+
+    float3 object_origin(point_transform(origin, m_inv_transform));
+    float3 object_direction(normalize(direction * m_inv_transform));
+
+    assert(isfinite(object_origin));
+    assert(equal(::length(object_direction), 1.0));
+
+    double result = m_geometry->pdf(object_origin, object_direction);
 
     assert(std::isfinite(result));
     assert(result >= 0.0);

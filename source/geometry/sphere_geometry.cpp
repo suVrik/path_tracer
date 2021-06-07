@@ -62,6 +62,17 @@ GeometrySample SphereGeometry::sample(const float2& random) const {
     return result;
 }
 
-double SphereGeometry::area() const {
-    return 4.0 * PI * sqr(m_radius);
+double SphereGeometry::pdf(const float3& origin, const float3& direction) const {
+    assert(isfinite(origin));
+    assert(equal(::length(direction), 1.0));
+
+    std::optional<GeometryHit> hit = raycast(origin, direction, std::numeric_limits<double>::infinity());
+    if (hit) {
+        double distance_squared = square_distance(hit->position, origin);
+        double consine = std::abs(dot(hit->normal, direction));
+        double area = 4.0 * PI * sqr(m_radius);
+        return distance_squared / (consine * area);
+    }
+
+    return 0.0;
 }

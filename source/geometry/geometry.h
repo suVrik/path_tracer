@@ -27,5 +27,5 @@ public:
 
     virtual GeometrySample sample(const float2& random) const = 0;
 
-    virtual double area() const = 0;
+    virtual double pdf(const float3& origin, const float3& direction) const = 0;
 };
