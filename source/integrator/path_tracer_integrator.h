@@ -1,8 +1,9 @@
 #pragma once
 
-#include "integrator/integrator.h"
 #include "film.h"
+#include "integrator/integrator.h"
 #include "primitive.h"
+#include "random.h"
 
 #include <atomic>
 #include <thread>
@@ -22,6 +23,7 @@ private:
         const Primitive* primitive;
     };
 
+    float3 sample_ray(Random& random, const float3& origin, const float3& outgoing, int diffuse_bounces, int specular_bounces);
     std::optional<PrimitiveHit> raycast(const float3& origin, const float3& direction) const;
 
     Film m_film;
@@ -29,8 +31,7 @@ private:
     int m_max_diffuse_bounces;
     int m_max_specular_bounces;
     std::vector<Primitive> m_primitives;
-
-    std::vector<int> m_shuffled_samples;
+    std::vector<Primitive*> m_light_primitives;
 
     int m_thread_count;
     std::vector<std::thread> m_threads;

@@ -1,6 +1,5 @@
 #include "geometry/box_geometry.h"
 #include "geometry/sphere_geometry.h"
-#include "integrator/bidirectional_path_tracer_integrator.h"
 #include "integrator/path_tracer_integrator.h"
 #include "material/diffuse_material.h"
 #include "material/emissive_material.h"
@@ -11,11 +10,11 @@
 #include <cassert>
 #include <SDL2/SDL.h>
 
-constexpr int WINDOW_WIDTH = 800;
-constexpr int WINDOW_HEIGHT = 600;
-constexpr int TEXTURE_WIDTH = 400;
-constexpr int TEXTURE_HEIGHT = 300;
-constexpr int SAMPLES_PER_PIXEL = 16384;
+constexpr int WINDOW_WIDTH = 1024;
+constexpr int WINDOW_HEIGHT = 1024;
+constexpr int TEXTURE_WIDTH = 1024;
+constexpr int TEXTURE_HEIGHT = 1024;
+constexpr int SAMPLES_PER_PIXEL = 1024;
 constexpr int DIFFUSE_BOUNCES_MAX = 4;
 constexpr int SPECULAR_BOUNCES_MAX = 4;
 
@@ -56,7 +55,7 @@ static std::vector<Primitive> build_scene() {
     auto white_material = std::make_shared<DiffuseMaterial>(float3(1.0));
     assert(white_material != nullptr);
 
-    auto emissive_material = std::make_shared<EmissiveMaterial>(float3(3.0));
+    auto emissive_material = std::make_shared<EmissiveMaterial>(float3(15.0));
     assert(emissive_material != nullptr);
 
     auto reflective_material = std::make_shared<SpecularReflectiveMaterial>(10.0);
@@ -74,8 +73,8 @@ static std::vector<Primitive> build_scene() {
         { long_wall_geometry,  white_material, float4x4::translation(float3(0.0, -1.0, 1.4))  }, // bottom wall
         { short_wall_geometry, white_material, float4x4::translation(float3(0.0, 0.0, 3.4))   }, // front wall
         { short_wall_geometry, white_material, float4x4::translation(float3(0.0, 0.0, -0.6))  }, // back wall
-        { top_side_geometry,   white_material, float4x4::translation(float3(-0.3, 1.0, 1.4)) }, // top left wall
-        { top_side_geometry,   white_material, float4x4::translation(float3(0.3, 1.0, 1.4))  }, // top right wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(-0.3, 1.0, 1.4))  }, // top left wall
+        { top_side_geometry,   white_material, float4x4::translation(float3(0.3, 1.0, 1.4))   }, // top right wall
         { top_front_geometry,  white_material, float4x4::translation(float3(0.0, 1.0, 2.7))   }, // top front wall
         { top_back_geometry,   white_material, float4x4::translation(float3(0.0, 1.0, 1.1))   }, // top back wall
 

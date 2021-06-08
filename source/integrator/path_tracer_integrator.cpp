@@ -3,8 +3,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <numeric>
-#include <random>
 
 PathTracerIntegrator::PathTracerIntegrator(int width, int height, int samples_per_pixel, int max_diffuse_bounces, int max_specular_bounces, std::vector<Primitive>&& primitives)
     : m_film(width, height)
@@ -12,14 +10,16 @@ PathTracerIntegrator::PathTracerIntegrator(int width, int height, int samples_pe
     , m_max_diffuse_bounces(max_diffuse_bounces)
     , m_max_specular_bounces(max_specular_bounces)
     , m_primitives(std::move(primitives))
-    , m_shuffled_samples(samples_per_pixel)
 {
     assert(m_samples_per_pixel > 0);
     assert(m_max_diffuse_bounces > 0);
     assert(m_max_specular_bounces >= 0);
 
-    std::iota(m_shuffled_samples.begin(), m_shuffled_samples.end(), 0);
-    std::shuffle(m_shuffled_samples.begin(), m_shuffled_samples.end(), std::default_random_engine());
+    for (Primitive& primitive : m_primitives) {
+        if (!equal(primitive.material_emissive(), 0.0)) {
+            m_light_primitives.push_back(&primitive);
+        }
+    }
 
     m_thread_count = std::clamp(static_cast<int>(std::thread::hardware_concurrency()), 1, m_film.tiles_x * m_film.tiles_y);
 
@@ -76,9 +76,6 @@ void PathTracerIntegrator::integrate(int thread_index) {
 
         for (int y = 0; y < tile_height; y++) {
             for (int x = 0; x < tile_width; x++) {
-                // Hide stratified sampling effect. Make it look uniform.
-                int shuffled_sample = m_shuffled_samples[(sample_index + (x_from * 23ll + y_from * 37ll) * (x * 43ll + y * 47ll)) % m_samples_per_pixel];
-
                 float2 offset = random.rand2();
 
                 double screen_x = x_from + x + offset.x;
@@ -90,55 +87,84 @@ void PathTracerIntegrator::integrate(int thread_index) {
                 float3 origin(0.0);
                 float3 outgoing = normalize(point_transform(float3(normalized_x, normalized_y, 1.0), inv_projection));
 
-                float3 beta(1.0);
-
-                int diffuse_bounces = 0;
-                int specular_bounces = 0;
-
-                while (diffuse_bounces < m_max_diffuse_bounces) {
-                    std::optional<PrimitiveHit> hit = raycast(origin, outgoing);
-                    if (!hit) {
-                        break;
-                    }
-
-                    samples[y][x] += beta * hit->primitive->material_emissive();
-
-                    float3x3 tangent_space = transpose(float3x3(hit->tangent, hit->bitangent, hit->normal));
-                    float3x3 inverse_tangent_space = inverse(tangent_space);
-                        
-                    float3 outgoing_tangent_space = normalize((-outgoing) * tangent_space);
-
-                    float2 random_value;
-                    if (diffuse_bounces == 0) {
-                        random_value = random.rand2(shuffled_sample);
-                    } else {
-                        random_value = random.rand2();
-                    }
-
-                    float3 ingoing_tangent_space;
-                    float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, random_value);
-                    if (equal(bsdf, 0.0) || equal(ingoing_tangent_space.z, 0.0)) {
-                        break;
-                    }
-
-                    origin = hit->position;
-                    outgoing = normalize(ingoing_tangent_space * inverse_tangent_space);
-
-                    beta *= bsdf * std::abs(ingoing_tangent_space.z) * 2;
-                    if (equal(beta, 0.0)) {
-                        break;
-                    }
-
-                    if (hit->primitive->is_material_specular() && specular_bounces < m_max_specular_bounces) {
-                        specular_bounces++;
-                    } else {
-                        diffuse_bounces++;
-                    }
-                }
+                samples[y][x] = sample_ray(random, origin, outgoing, 0, 0);
             }
         }
 
         m_film.add_samples(tile_x, tile_y, samples);
+    }
+}
+
+float3 PathTracerIntegrator::sample_ray(Random& random, const float3& origin, const float3& outgoing, int diffuse_bounces, int specular_bounces) {
+    std::optional<PrimitiveHit> hit = raycast(origin, outgoing);
+    if (!hit) {
+        return float3(0.0);
+    }
+
+    if (hit->primitive->is_material_specular() && specular_bounces < m_max_specular_bounces) {
+        specular_bounces++;
+    } else {
+        diffuse_bounces++;
+    }
+
+    if (diffuse_bounces >= m_max_diffuse_bounces) {
+        return hit->primitive->material_emissive();
+    }
+
+    float3x3 tangent_space = transpose(float3x3(hit->tangent, hit->bitangent, hit->normal));
+    float3x3 inverse_tangent_space = inverse(tangent_space);
+                        
+    float3 outgoing_tangent_space = normalize((-outgoing) * tangent_space);
+
+    if ((m_light_primitives.empty() || hit->primitive->is_material_specular() || random.rand() < 0.5)) {
+        float3 ingoing_tangent_space;
+        double material_pdf;
+        float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, material_pdf, random.rand2());
+        if (bsdf == float3(0.0) || ingoing_tangent_space.z == 0.0 || material_pdf == 0.0) {
+            return hit->primitive->material_emissive();
+        }
+
+        float3 ingoing = normalize(ingoing_tangent_space * inverse_tangent_space);
+
+        double weight = 1.0;
+        if (!m_light_primitives.empty() && !hit->primitive->is_material_specular()) {
+            double light_pdf = 0.0;
+            for (Primitive* light : m_light_primitives) {
+                light_pdf += light->geometry_pdf(hit->position, ingoing);
+            }
+            light_pdf /= m_light_primitives.size();
+
+            weight = sqr(material_pdf) / (sqr(material_pdf) + sqr(light_pdf));
+        }
+
+        return hit->primitive->material_emissive() + bsdf * std::abs(ingoing_tangent_space.z) * sample_ray(random, hit->position, ingoing, diffuse_bounces, specular_bounces) * weight / material_pdf;
+    } else {
+        int light_index = static_cast<int>(random.rand() * m_light_primitives.size());
+        assert(m_light_primitives[light_index] != nullptr);
+
+        GeometrySample geometry_sample = m_light_primitives[light_index]->geometry_sample(random.rand2());
+
+        float3 ingoing = normalize(geometry_sample.position - hit->position);
+        float3 ingoing_tangent_space = normalize(ingoing * tangent_space);
+        if (ingoing_tangent_space.z <= 0.0) {
+            return hit->primitive->material_emissive();
+        }
+
+        double material_pdf;
+        float3 bsdf = hit->primitive->material_bsdf(ingoing_tangent_space, outgoing_tangent_space, material_pdf);
+        if (bsdf == float3(0.0) || ingoing_tangent_space.z == 0.0 || material_pdf == 0.0) {
+            return hit->primitive->material_emissive();
+        }
+
+        double light_pdf = 0.0;
+        for (Primitive* light : m_light_primitives) {
+            light_pdf += light->geometry_pdf(hit->position, ingoing);
+        }
+        light_pdf /= m_light_primitives.size();
+
+        double weight = sqr(light_pdf) / (sqr(material_pdf) + sqr(light_pdf));
+
+        return hit->primitive->material_emissive() + bsdf * std::abs(ingoing_tangent_space.z) * sample_ray(random, hit->position, ingoing, diffuse_bounces, specular_bounces) * weight / light_pdf;
     }
 }
 
