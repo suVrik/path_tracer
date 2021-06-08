@@ -42,7 +42,7 @@ void PathTracerIntegrator::blit(void* rgba, int pitch) {
 void PathTracerIntegrator::integrate(int thread_index) {
     assert(thread_index >= 0 && thread_index < m_thread_count);
 
-    Random random(thread_index, m_samples_per_pixel);
+    Random random(thread_index);
 
     int tiles_total = m_film.tiles_x * m_film.tiles_y;
     int tiles_per_thread = tiles_total / m_thread_count;
